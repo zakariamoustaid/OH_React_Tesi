@@ -3,4 +3,4 @@ Il progetto di Tesi riguarda l'implementazione e lo sviluppo della parte di Bill
 La repository contiene una web user interface relativo al progetto Open Hospital che consiste in una React SPA (single page application).
 # Open Hospital
 Link al progetto: [OH-UI](https://github.com/informatici/openhospital-ui) \
-Maggiori informazioni Open Hospital: [Sito OH](https://www.informaticisenzafrontiere.org/progetti/open-hospital)
+Maggiori informazioni su Open Hospital: [Informatici senza Frontiere](https://www.informaticisenzafrontiere.org/progetti/open-hospital)

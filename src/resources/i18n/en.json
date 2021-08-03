@@ -81,6 +81,8 @@
     "weightabbr": "(W)"
   },
   "nav": {
+    "newbill": "New Bill",
+    "bill_chose": "Chose an option",
     "pharmacy": "Pharmacy",
     "ward": "Ward",
     "billing": "Billing",
@@ -93,6 +95,7 @@
     "newpatient": "New patient",
     "editpatient": "Edit Patient",
     "searchpatient": "Search Patient",
+    "searchbill": "Search Bill",
     "patientdashboard": "Patient Dashboard"
 
   },

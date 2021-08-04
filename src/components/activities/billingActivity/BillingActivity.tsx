@@ -3,6 +3,7 @@ import AppHeader from "../../accessories/appHeader/AppHeader";
 import Footer from "../../accessories/footer/Footer";
 import Button from "@material-ui/core/Button";
 import { IState } from "../../../types";
+import { Link, useHistory } from "react-router-dom";
 import { IStateProps, TProps } from "./types";
 import { useTranslation } from "react-i18next";
 import "./styles.scss";
@@ -11,6 +12,8 @@ const BillingActivity: FunctionComponent<TProps> = ({
     userCredentials
 }) => {
     const { t } = useTranslation();
+
+    const history = useHistory();
 
     const breadcrumbMap = {
         [t("nav.dashboard")]: "/",
@@ -29,7 +32,8 @@ const BillingActivity: FunctionComponent<TProps> = ({
                         <h3>{t("nav.bill_chose")}</h3>
                         <div className="bill_buttons__Container">
 
-                            <Button className="new_bill__button" variant="outlined" size="large">
+                            <Button className="new_bill__button" variant="outlined" size="large" onClick={() => history.push("/bills")}>
+                                
                                 {t("nav.newbill")}
                             </Button>
                             <Button className="search_bill__button" variant="outlined" size="large">

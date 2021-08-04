@@ -11,6 +11,7 @@ import NotFound from "./components/activities/notFound/NotFound";
 import PatientDetailsActivity from "./components/activities/patientDetailsActivity/PatientDetailsActivity";
 import SearchPatientActivity from "./components/activities/searchPatientActivity/SearchPatientActivity";
 import BillingActivity from "./components/activities/billingActivity/BillingActivity";
+import NewBillActivity from "./components/activities/newBillActivity/NewBillActivity";
 
 const Routes: FunctionComponent = () => {
   return (
@@ -21,8 +22,11 @@ const Routes: FunctionComponent = () => {
             <LoginActivity />
           </RedirectAfterLogin>
         </Route>
-        <PrivateRoute path="/bill">
+        <PrivateRoute path="/billing">
           <BillingActivity />
+        </PrivateRoute>
+        <PrivateRoute path="/bills">
+          <NewBillActivity billHomeRoute="/billing"/>
         </PrivateRoute>
         <PrivateRoute exact path="/">
           <DashboardActivity

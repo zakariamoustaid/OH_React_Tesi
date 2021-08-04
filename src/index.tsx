@@ -10,6 +10,7 @@ import { makeServer } from "./mockServer/server";
 import * as serviceWorker from "./serviceWorker";
 import examinations from "./state/examinations/reducer";
 import main from "./state/main/reducer";
+import bills from "./state/bills/reducer";
 import patients from "./state/patients/reducer";
 import therapies from "./state/therapies/reducer";
 import summary from "./state/summary/reducer";
@@ -31,6 +32,7 @@ const reducer = combineReducers<IState>({
   opds,
   diseases,
   medicals,
+  bills,
 });
 const store = createStore(
   reducer,

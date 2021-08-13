@@ -1,20 +1,105 @@
 @import "../../../styles/variables";
 @import "../../../../node_modules/susy/sass/susy";
 
-.new_bill {
-    background-color: $c-color-secondary;
+.new_Bill {
+  background-color: $c-color-secondary;
 
-    .new_bill__background {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+  .newBill__background {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .newBill__content {
+    width: 80%;
+    @include susy-media($narrow) {
+      width: 90%;
     }
-  
-    .new_bill__title {
-      font-size: xx-large;
-      color: $c-black;
-      font-weight: bolder;
-      margin: 30px 20px;
+    @include susy-media($tablet_land) {
+      width: 90%;
     }
+    @include susy-media($tablet_port) {
+      width: 90%;
+    }
+    @include susy-media($smartphone) {
+      width: 90%;
+    }
+  }
+
+  .newBill__title {
+    font-size: xx-large;
+    color: $c-black;
+    font-weight: bolder;
+    margin: 45px 0px 70px 0px;
+    @include susy-media($tablet_port) {
+      font-size: x-large;
+    }
+    @include susy-media($smartphone) {
+      margin: 45px 0px 80px 0px;
+      font-size: x-large;
+    }
+  }
+
+  .newBill__panel {
+    display: grid;;
+    flex-direction: column;
+    position:relative;
+    align-items: center;
+    background-color: $c-white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px 0 rgba(48, 49, 51, 0.1);
+    margin: 20px 80px 60px 80px;
+    overflow: hidden;
+    @include susy-media($tablet_port) {
+      font-size: x-large;
+    }
+    @include susy-media($smartphone) {
+      margin: 45px 0px 80px 0px;
+      font-size: x-large;
+    }
+  }
+
+  .newBill_Head {
+    position: sticky;
+  }
+
+  .newBill_Date_Pat {
+    margin-top: 10px;
+    margin-left: 10px;
+    width: 95%;
+    .bill_SelectPat {
+      height: 50px;
+      margin-left: 35px;
+    }
+  }
+  .newBill_InputPat {
+    display: inline-block;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    width: 80%;
+    .patient_input {
+      margin-left: 15px;
+      width:80%;
+    }
+  }
+
+
+
+  .newBill_Drawer {
+    float: right;
+    margin-right: 80px;
+  }
+
+  .newBill_Rows {
+    margin-top: 15px;
+    margin-left: 5px;
+    width: 80%;
+  }
+
+
+  .footer {
+    position: relative;
+  }
 }

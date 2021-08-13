@@ -12,6 +12,9 @@ import {
     CREATE_BILL_LOADING,
     CREATE_BILL_RESET,
     CREATE_BILL_SUCCESS,
+    SEARCH_BILL_FAIL,
+    SEARCH_BILL_LOADING,
+    SEARCH_BILL_SUCCESS,
 } from "./consts";
 
 const billControllerApi = new BillControllerApi(
@@ -19,26 +22,26 @@ const billControllerApi = new BillControllerApi(
 );
 
 export const createBill =
-    (newBillDto: FullBillDTO) =>
-        (dispatch: Dispatch<IAction<null, {}>>): void => {
-            dispatch({
-                type: CREATE_BILL_LOADING,
-            });
+  (newBillDto: FullBillDTO) =>
+  (dispatch: Dispatch<IAction<null, {}>>): void => {
+    dispatch({
+      type: CREATE_BILL_LOADING,
+    });
 
-            billControllerApi.newBillUsingPOST({ newBillDto }).subscribe(
-                () => {
-                    dispatch({
-                        type: CREATE_BILL_SUCCESS,
-                    });
-                },
-                (error) => {
-                    dispatch({
-                        type: CREATE_BILL_FAIL,
-                        error,
-                    });
-                }
-            );
-        };
+    billControllerApi.newBillUsingPOST({ newBillDto }).subscribe(
+      (payload) => {
+        dispatch({
+          type: CREATE_BILL_SUCCESS,
+        });
+      },
+      (error) => {
+        dispatch({
+          type: CREATE_BILL_FAIL,
+          error: error,
+        });
+      }
+    );
+  };
 
 export const createBillReset =
     () =>

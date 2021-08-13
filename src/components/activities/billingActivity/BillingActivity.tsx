@@ -19,6 +19,9 @@ const BillingActivity: FunctionComponent<TProps> = ({
         [t("nav.dashboard")]: "/",
         [t("nav.billing")]: "/bill",
     };
+
+    
+
     return (
         <div className="billing">
             <AppHeader
@@ -31,9 +34,7 @@ const BillingActivity: FunctionComponent<TProps> = ({
                     <form className="billing__panel">
                         <h3>{t("nav.bill_chose")}</h3>
                         <div className="bill_buttons__Container">
-
                             <Button className="new_bill__button" variant="outlined" size="large" onClick={() => history.push("/bills")}>
-                                
                                 {t("nav.newbill")}
                             </Button>
                             <Button className="search_bill__button" variant="outlined" size="large">

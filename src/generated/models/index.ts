@@ -52,3 +52,6 @@ export * from './VaccineDTO';
 export * from './VaccineTypeDTO';
 export * from './VisitDTO';
 export * from './WardDTO';
+export * from './PriceDTO';
+export * from './PriceList';
+export * from './PriceListDTO';

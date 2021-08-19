@@ -22,6 +22,7 @@ export * from './MedicalTypeControllerApi';
 export * from './OpdControllerApi';
 export * from './PatientControllerApi';
 export * from './PermissionControllerApi';
+export * from './PriceListControllerApi';
 export * from './ReportsControllerApi';
 export * from './SmsControllerApi';
 export * from './StockMovementControllerApi';

@@ -15,7 +15,7 @@ import { Observable, of, Subscriber } from 'rxjs';
 import { ajax, AjaxRequest, AjaxResponse } from 'rxjs/ajax';
 import { map, concatMap } from 'rxjs/operators';
 
-export const BASE_PATH = 'https://www.open-hospital.org/oh-api'.replace(/\/+$/, '');
+export const BASE_PATH = 'https://www.open-hospital.org/oh11-api'.replace(/\/+$/, '');
 
 export interface ConfigurationParameters {
     basePath?: string; // override base path
@@ -97,7 +97,7 @@ export class BaseAPI {
         // this is done to avoid urls ending with a '?' character which buggy webservers
         // do not handle correctly sometimes.
         const url = `${this.configuration.basePath}${baseUrl}${query && Object.keys(query).length ? `?${queryString(query)}`: ''}`;
-
+        console.log(url);
         return {
             url,
             method,

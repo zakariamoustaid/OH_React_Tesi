@@ -85,8 +85,6 @@
     }
   }
 
-
-
   .newBill_Drawer {
     float: right;
     margin-right: 80px;
@@ -101,5 +99,18 @@
 
   .footer {
     position: relative;
+  }
+
+  .bill_Modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .bill_Modal {
+    background-Color: #a6d4fa;
+    border: 2px solid #000;
+    box-Shadow: #a6d4fa;
+    padding: (2, 4, 3),
   }
 }

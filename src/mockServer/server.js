@@ -10,6 +10,8 @@ import { opdRoutes } from "./routes/opd";
 import { diseasesRoutes } from "./routes/diseases";
 import { therapyRoutes } from "./routes/therapies";
 import { medicalRoutes } from "./routes/medicals";
+import { billRoutes } from "./routes/bill";
+import { pricesRoutes } from "./routes/prices"
 
 export function makeServer() {
   Polly.register(XHRAdapter);
@@ -21,7 +23,7 @@ export function makeServer() {
   const { server } = polly;
 
   server.host(BASE_PATH, () => {
-    authRoutes(server);
+    //authRoutes(server);
     patientRoutes(server);
     userRoutes(server);
     visitRoutes(server);
@@ -29,7 +31,9 @@ export function makeServer() {
     therapyRoutes(server);
     opdRoutes(server);
     diseasesRoutes(server);
-    medicalRoutes(server);
+    //pricesRoutes(server);
+    //billRoutes(server);
+    //medicalRoutes(server);
   });
   return server;
 }

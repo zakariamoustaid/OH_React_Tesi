@@ -2,8 +2,6 @@ import React, { FunctionComponent, useEffect, useRef, useState } from "react";
 import AppHeader from "../../accessories/appHeader/AppHeader";
 import Footer from "../../accessories/footer/Footer";
 import Button from "@material-ui/core/Button";
-import Modal from "@material-ui/core/Modal";
-import patientDTO from "/home/zak/Tesi/OH_React_Tesi/src/mockServer/fixtures/patientDTO.js";
 import Table from '@material-ui/core/Table';
 import TextData from '@material-ui/core/TextField'
 import TableBody from '@material-ui/core/TableBody';
@@ -13,49 +11,39 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Divider from '@material-ui/core/Divider';
 import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
 import List from '@material-ui/core/List';
 import Paper from '@material-ui/core/Paper';
-import { green } from '@material-ui/core/colors';
-import Icon from '@material-ui/core/Icon';
 import { useTranslation } from "react-i18next";
 import { connect, useDispatch } from "react-redux";
-import { Redirect } from "react-router";
 import { IState } from "../../../types";
-import { useFormik } from "formik";
-import TextField from "../../accessories/textField/TextField";
-import { BillDTO, PatientDTO } from "../../../generated";
-import { FullBillDTO } from "../../../generated";
-import { scrollToElement } from "../../../libraries/uiUtils/scrollToElement";
-import Drawer from '@material-ui/core/Drawer';
-import AppBar from '@material-ui/core/AppBar';
 import "./styles.scss";
-import SearchIcon from "../../../assets/SearchIcon";
+import TextField from '@material-ui/core/TextField';
+import Dialog from '@material-ui/core/Dialog';
+import { DataGrid, GridColDef, GridValueGetterParams, GridSelectionModel, GridRowId } from '@material-ui/data-grid';
+import { useDemoData } from '@material-ui/x-grid-data-generator';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import AddIcon from '@material-ui/icons/Add';
 import SaveIcon from '@material-ui/icons/Save';
-
 import {
     createBill,
     createBillReset,
+    getBill,
 } from "../../../state/bills/actions";
-
+import {
+    getPrices,
+    getPriceLists
+} from "../../../state/prices/actions"
 import {
     getMedicals,
 } from "../../../state/medicals/actions"
-
-import { MedicalDTO } from "../../../generated";
-
 import {
     IDispatchProps,
     IStateProps,
-    TActivityTransitionState,
     TProps,
-    TValues,
 } from "./types";
-
-import { getPatientSuccess } from "/home/zak/Tesi/OH_React_Tesi/src/state/patients/actions";
-
 
 
 const NewBillActivity: FunctionComponent<TProps> = ({
@@ -69,6 +57,12 @@ const NewBillActivity: FunctionComponent<TProps> = ({
     med,
     getMedicals,
     getMedStat,
+    bill,
+    getBill,
+    prices,
+    getPrices,
+    priceLists,
+    getPriceLists
 }) => {
     const { t } = useTranslation();
 
@@ -77,35 +71,198 @@ const NewBillActivity: FunctionComponent<TProps> = ({
         [t("nav.billing")]: "/billing",
         [t("nav.newbill")]: "/bills",
     };
-
-    //
-    //Gestione Modal
-    //
-    const [open, setOpen] = React.useState(false);
-    const handleOpen = () => {
-        setOpen(true);
-    };
-    const handleClose = () => {
-        setOpen(false);
-    };
-    const body = (
-        <div>
-            <p>ciao</p>
-        </div>
-    )
-    //
-    //
-    const x = med;
-
     useEffect(() => {
         getMedicals();
     }, []);
 
-    const tet = () => {
-        med?.map((m, i) => {
-            console.log(i, m.description);
+    useEffect(() => {
+        getPrices();
+    }, [])
+    //
+    //Gestione Dialog
+    //
+    const [open_med, setOpen_med] = React.useState(false);
+
+    const handleClickOpen_med = () => {
+        setOpen_med(true);
+    };
+
+    const handleClose_med = () => {
+        setOpen_med(false);
+    };
+
+    const [open_ope, setOpen_ope] = React.useState(false);
+
+    const handleClickOpen_ope = () => {
+        setOpen_ope(true);
+    };
+
+    const handleClose_ope = () => {
+        setOpen_ope(false);
+    };
+
+    const [open_exa, setOpen_exa] = React.useState(false);
+
+    const handleClickOpen_exa = () => {
+        setOpen_exa(true);
+    };
+
+    const handleClose_exa = () => {
+        setOpen_exa(false);
+    };
+
+    const [open_oth, setOpen_oth] = React.useState(false);
+
+    const handleClickOpen_oth = () => {
+        setOpen_exa(true);
+    };
+
+    const handleClose_oth = () => {
+        setOpen_exa(false);
+    };
+    //
+    //
+
+    //
+    //test useState
+    //
+
+    const [medicals, setmedicals] = React.useState<GridSelectionModel>([]);
+    let item: GridRowId = '';
+
+    const add_med = () => {
+        medicals?.forEach(function (m, i) {
+            item = m;
         })
     }
+    const get_i = () => {
+        return (
+            <p>{item}</p>
+        )
+    }
+    //
+    //
+
+
+    //  //  //  //  //  //
+    // Gestione Grid MED//
+    //  //  //  //  //  //
+    const columns_med: GridColDef[] = [
+        { field: 'id', headerName: 'ID', width: 90 },
+        {
+            field: 'group',
+            headerName: 'Group',
+            width: 250,
+            editable: true,
+        },
+        {
+            field: 'description',
+            headerName: 'Description',
+            width: 250,
+            editable: true,
+        },
+    ];
+
+    const rows_med = [{}];
+
+    prices?.forEach(function (m, i) {
+        if (m.group === "MED")
+            rows_med.push({ id: m.id, group: m.group, description: m.list?.description })
+    })
+    rows_med.shift();
+    //
+    //
+
+    //  //  //  //  //  //
+    // Gestione Grid OPE//
+    //  //  //  //  //  //
+    const columns_ope: GridColDef[] = [
+        { field: 'id', headerName: 'ID', width: 90 },
+        {
+            field: 'group',
+            headerName: 'Group',
+            width: 250,
+            editable: true,
+        },
+        {
+            field: 'description',
+            headerName: 'Description',
+            width: 250,
+            editable: true,
+        },
+    ];
+
+    const rows_ope = [{}];
+
+    prices?.forEach(function (m, i) {
+        if (m.group === "OPE")
+            rows_ope.push({ id: m.id, group: m.group, description: m.list?.description })
+    })
+    rows_ope.shift();
+    //
+    //
+
+    //  //  //  //  //  //
+    // Gestione Grid EXA//
+    //  //  //  //  //  //
+    const columns_exa: GridColDef[] = [
+        { field: 'id', headerName: 'ID', width: 90 },
+        {
+            field: 'group',
+            headerName: 'Group',
+            width: 250,
+            editable: true,
+        },
+        {
+            field: 'description',
+            headerName: 'Description',
+            width: 250,
+            editable: true,
+        },
+    ];
+
+    const rows_exa = [{}];
+
+    prices?.forEach(function (m, i) {
+        if (m.group === "EXA")
+            rows_exa.push({ id: m.id, group: m.group, description: m.list?.description })
+    })
+    rows_exa.shift();
+    //
+    //
+
+    //  //  //  //  //  //
+    // Gestione Grid OTH//
+    //  //  //  //  //  //
+    const columns_oth: GridColDef[] = [
+        { field: 'id', headerName: 'ID', width: 90 },
+        {
+            field: 'group',
+            headerName: 'Group',
+            width: 250,
+            editable: true,
+        },
+        {
+            field: 'description',
+            headerName: 'Description',
+            width: 250,
+            editable: true,
+        },
+    ];
+
+    const rows_oth = [{}];
+
+    prices?.forEach(function (m, i) {
+        if (m.group === "OTH")
+            rows_oth.push({ id: m.id, group: m.group, description: m.list?.description })
+    })
+    rows_oth.shift();
+    //
+    //
+
+
+
+    //fetch('https://www.open-hospital.org/oh11-api/pricelists/prices').then(res => res.json()).then(data => console.log(data)).catch(error => console.log('male'));
 
 
     return (
@@ -118,7 +275,6 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                 <div className="newBill__content">
                     <div className="newBill__title">{t("nav.newbill")}</div>
                     <div className="newBill__panel">
-                        <Divider />
                         <form>
                             <div className="newBill_Head">
                                 <div className="newBill_Date_Pat">
@@ -139,10 +295,78 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                             <Divider />
                             <div className="newBill_Drawer">
                                 <List className="bill_Drawer">
-                                    <ListItem button key="Medical"><AddIcon></AddIcon>Medical</ListItem>
-                                    <ListItem button key="Operation"><AddIcon></AddIcon>Operation</ListItem>
-                                    <ListItem button key="Exam"><AddIcon></AddIcon>Exam</ListItem>
-                                    <ListItem button key="Other"><AddIcon></AddIcon>Other</ListItem>
+                                    <div>
+                                        <ListItem button key="Medical" onClick={handleClickOpen_med}><AddIcon></AddIcon>Medical</ListItem>
+                                        <Dialog open={open_med} onClose={handleClose_med} aria-labelledby="form-dialog-title">
+                                            <DialogTitle id="form-dialog-title">Select Medical</DialogTitle>
+                                            <Button>Confirm</Button>
+                                            <DialogContent>
+                                                <div style={{ height: 700, width: 1000 }}>
+                                                    <DataGrid
+                                                        rows={rows_med}
+                                                        columns={columns_med}
+                                                        checkboxSelection
+                                                        disableSelectionOnClick
+                                                        onSelectionModelChange={e => setmedicals(e)}
+                                                    />
+                                                </div>
+                                            </DialogContent>
+                                        </Dialog>
+                                    </div>
+                                    <div>
+                                        <ListItem button key="Medical" onClick={handleClickOpen_ope}><AddIcon></AddIcon>Operation</ListItem>
+                                        <Dialog open={open_ope} onClose={handleClose_ope} aria-labelledby="form-dialog-title">
+                                            <DialogTitle id="form-dialog-title">Select Operation</DialogTitle>
+                                            <Button>Confirm</Button>
+                                            <DialogContent>
+                                                <div style={{ height: 700, width: 600 }}>
+                                                    <DataGrid
+                                                        rows={rows_ope}
+                                                        columns={columns_ope}
+                                                        checkboxSelection
+                                                        disableSelectionOnClick
+                                                        onSelectionModelChange={e => setmedicals(e)}
+                                                    />
+                                                </div>
+                                            </DialogContent>
+                                        </Dialog>
+                                    </div>
+                                    <div>
+                                        <ListItem button key="Exam" onClick={handleClickOpen_exa}><AddIcon></AddIcon>Exam</ListItem>
+                                        <Dialog open={open_exa} onClose={handleClose_exa} aria-labelledby="form-dialog-title">
+                                            <DialogTitle id="form-dialog-title">Select Exam</DialogTitle>
+                                            <Button>Confirm</Button>
+                                            <DialogContent>
+                                                <div style={{ height: 700, width: 1000 }}>
+                                                    <DataGrid
+                                                        rows={rows_exa}
+                                                        columns={columns_exa}
+                                                        checkboxSelection
+                                                        disableSelectionOnClick
+                                                        onSelectionModelChange={e => setmedicals(e)}
+                                                    />
+                                                </div>
+                                            </DialogContent>
+                                        </Dialog>
+                                    </div>
+                                    <div>
+                                        <ListItem button key="Other" onClick={handleClickOpen_oth}><AddIcon></AddIcon>Other</ListItem>
+                                        <Dialog open={open_oth} onClose={handleClose_oth} aria-labelledby="form-dialog-title">
+                                            <DialogTitle id="form-dialog-title">Select Exam</DialogTitle>
+                                            <Button>Confirm</Button>
+                                            <DialogContent>
+                                                <div style={{ height: 700, width: 1000 }}>
+                                                    <DataGrid
+                                                        rows={rows_oth}
+                                                        columns={columns_oth}
+                                                        checkboxSelection
+                                                        disableSelectionOnClick
+                                                        onSelectionModelChange={e => setmedicals(e)}
+                                                    />
+                                                </div>
+                                            </DialogContent>
+                                        </Dialog>
+                                    </div>
                                     <ListItem button key="Other"><AddIcon></AddIcon>Custom</ListItem>
                                     <ListItem button key="Other"><SaveIcon></SaveIcon>SAVE</ListItem>
                                 </List>
@@ -158,12 +382,7 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {med?.map((m, i) => (
-                                                <TableRow>
-                                                    <TableCell>{i}</TableCell>
-                                                    <TableCell>{m.description}</TableCell>
-                                                </TableRow>
-                                            ))}
+                                            {get_i}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>
@@ -183,8 +402,11 @@ const mapStateToProps = (state: IState): IStateProps => ({
     isLoading: state.bills.createBill.status === "LOADING",
     hasSucceeded: state.bills.createBill.status === "SUCCESS",
     hasFailed: state.bills.createBill.status === "FAIL",
+    bill: state.bills.getBill.data,
     med: state.medicals.medicalsOrderByName.data,
-    getMedStat: state.medicals.medicalsOrderByName.status || "IDLE"
+    prices: state.prices.getPrices.data,
+    getMedStat: state.medicals.medicalsOrderByName.status || "IDLE",
+    priceLists: state.prices.getPriceLists.data
 });
 
 
@@ -194,6 +416,9 @@ const mapDispatchToProps: IDispatchProps = {
     createBill,
     createBillReset,
     getMedicals,
+    getBill,
+    getPrices,
+    getPriceLists
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(NewBillActivity);

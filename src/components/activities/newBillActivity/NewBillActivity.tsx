@@ -14,19 +14,16 @@ import ListItem from '@material-ui/core/ListItem';
 import List from '@material-ui/core/List';
 import Paper from '@material-ui/core/Paper';
 import { useTranslation } from "react-i18next";
-import { connect, useDispatch } from "react-redux";
+import { connect } from "react-redux";
 import { IState } from "../../../types";
 import "./styles.scss";
-import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
-import { DataGrid, GridColDef, GridValueGetterParams, GridSelectionModel, GridRowId } from '@material-ui/data-grid';
-import { useDemoData } from '@material-ui/x-grid-data-generator';
-import DialogActions from '@material-ui/core/DialogActions';
+import { DataGrid, GridSelectionModel, GridColDef, GridRowId } from '@material-ui/data-grid';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import AddIcon from '@material-ui/icons/Add';
 import SaveIcon from '@material-ui/icons/Save';
+import TextField from '@material-ui/core/TextField';
 import {
     createBill,
     createBillReset,
@@ -114,11 +111,21 @@ const NewBillActivity: FunctionComponent<TProps> = ({
     const [open_oth, setOpen_oth] = React.useState(false);
 
     const handleClickOpen_oth = () => {
-        setOpen_exa(true);
+        setOpen_oth(true);
     };
 
     const handleClose_oth = () => {
-        setOpen_exa(false);
+        setOpen_oth(false);
+    };
+
+    const [open_cust, setOpen_cust] = React.useState(false);
+
+    const handleClickOpen_cust = () => {
+        setOpen_cust(true);
+    };
+
+    const handleClose_cust = () => {
+        setOpen_cust(false);
     };
     //
     //
@@ -126,20 +133,51 @@ const NewBillActivity: FunctionComponent<TProps> = ({
     //
     //test useState
     //
+    const [selectionModel, setSelectionModel] = React.useState<GridSelectionModel>([]);
+    let item: Array<{}> = [];
+    const [items, setItems] = React.useState<GridSelectionModel>([]);
+    const [medicals, setMedicals] = React.useState<GridSelectionModel>([]);
+    const [operations, setOperations] = React.useState<GridSelectionModel>([]);
+    const [exams, setExams] = React.useState<GridSelectionModel>([]);
+    const [others, setOthers] = React.useState<GridSelectionModel>([]);
 
-    const [medicals, setmedicals] = React.useState<GridSelectionModel>([]);
-    let item: GridRowId = '';
-
-    const add_med = () => {
-        medicals?.forEach(function (m, i) {
-            item = m;
+    const get_items_m = () => {
+        medicals?.forEach(function (i, j) {
+            if (!(items.includes(i)))
+                setItems(prevItems => [...prevItems, i]);
         })
     }
-    const get_i = () => {
-        return (
-            <p>{item}</p>
-        )
+    const get_items_o = () => {
+        operations?.forEach(function (i, j) {
+            if (!(items.includes(i)))
+                setItems(prevItems => [...prevItems, i]);
+        })
     }
+    const get_items_e = () => {
+        exams?.forEach(function (i, j) {
+            if (!(items.includes(i)))
+                setItems(prevItems => [...prevItems, i]);
+        })
+    }
+    const get_items_ot = () => {
+        others?.forEach(function (i, j) {
+            if (!(items.includes(i)))
+                setItems(prevItems => [...prevItems, i]);
+        })
+    }
+
+    const body_item = () => {
+        items?.forEach(function (i, j) {
+            console.log("dai");
+            console.log(i);
+        })
+    }
+
+    const delete_item = (e: GridRowId) => {
+        console.log(e);
+        setItems(items.filter(item => e !== item));
+    }
+
     //
     //
 
@@ -152,13 +190,13 @@ const NewBillActivity: FunctionComponent<TProps> = ({
         {
             field: 'group',
             headerName: 'Group',
-            width: 250,
+            width: 125,
             editable: true,
         },
         {
             field: 'description',
             headerName: 'Description',
-            width: 250,
+            width: 170,
             editable: true,
         },
     ];
@@ -181,13 +219,13 @@ const NewBillActivity: FunctionComponent<TProps> = ({
         {
             field: 'group',
             headerName: 'Group',
-            width: 250,
+            width: 125,
             editable: true,
         },
         {
             field: 'description',
             headerName: 'Description',
-            width: 250,
+            width: 170,
             editable: true,
         },
     ];
@@ -210,13 +248,13 @@ const NewBillActivity: FunctionComponent<TProps> = ({
         {
             field: 'group',
             headerName: 'Group',
-            width: 250,
+            width: 125,
             editable: true,
         },
         {
             field: 'description',
             headerName: 'Description',
-            width: 250,
+            width: 170,
             editable: true,
         },
     ];
@@ -239,13 +277,13 @@ const NewBillActivity: FunctionComponent<TProps> = ({
         {
             field: 'group',
             headerName: 'Group',
-            width: 250,
+            width: 125,
             editable: true,
         },
         {
             field: 'description',
             headerName: 'Description',
-            width: 250,
+            width: 170,
             editable: true,
         },
     ];
@@ -259,7 +297,6 @@ const NewBillActivity: FunctionComponent<TProps> = ({
     rows_oth.shift();
     //
     //
-
 
 
     //fetch('https://www.open-hospital.org/oh11-api/pricelists/prices').then(res => res.json()).then(data => console.log(data)).catch(error => console.log('male'));
@@ -290,7 +327,7 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                                     />
                                     <Button className='bill_SelectPat' variant="outlined">find Patient</Button>
                                 </div>
-                                <div className="newBill_InputPat"><label>Patient</label><span></span><input className="patient_input" disabled></input></div>
+                                <div className="newBill_InputPat"><label>Patient</label><span></span><input className="patient_input" value="Mario Rossi" disabled></input></div>
                             </div>
                             <Divider />
                             <div className="newBill_Drawer">
@@ -299,15 +336,15 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                                         <ListItem button key="Medical" onClick={handleClickOpen_med}><AddIcon></AddIcon>Medical</ListItem>
                                         <Dialog open={open_med} onClose={handleClose_med} aria-labelledby="form-dialog-title">
                                             <DialogTitle id="form-dialog-title">Select Medical</DialogTitle>
-                                            <Button>Confirm</Button>
+                                            <Button onClick={get_items_m}>Confirm</Button>
                                             <DialogContent>
-                                                <div style={{ height: 700, width: 1000 }}>
+                                                <div style={{ height: 400, width: 450 }}>
                                                     <DataGrid
                                                         rows={rows_med}
                                                         columns={columns_med}
                                                         checkboxSelection
                                                         disableSelectionOnClick
-                                                        onSelectionModelChange={e => setmedicals(e)}
+                                                        onSelectionModelChange={e => setMedicals(e)}
                                                     />
                                                 </div>
                                             </DialogContent>
@@ -317,15 +354,15 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                                         <ListItem button key="Medical" onClick={handleClickOpen_ope}><AddIcon></AddIcon>Operation</ListItem>
                                         <Dialog open={open_ope} onClose={handleClose_ope} aria-labelledby="form-dialog-title">
                                             <DialogTitle id="form-dialog-title">Select Operation</DialogTitle>
-                                            <Button>Confirm</Button>
+                                            <Button onClick={get_items_o}>Confirm</Button>
                                             <DialogContent>
-                                                <div style={{ height: 700, width: 600 }}>
+                                                <div style={{ height: 400, width: 450 }}>
                                                     <DataGrid
                                                         rows={rows_ope}
                                                         columns={columns_ope}
                                                         checkboxSelection
                                                         disableSelectionOnClick
-                                                        onSelectionModelChange={e => setmedicals(e)}
+                                                        onSelectionModelChange={e => setOperations(e)}
                                                     />
                                                 </div>
                                             </DialogContent>
@@ -335,15 +372,15 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                                         <ListItem button key="Exam" onClick={handleClickOpen_exa}><AddIcon></AddIcon>Exam</ListItem>
                                         <Dialog open={open_exa} onClose={handleClose_exa} aria-labelledby="form-dialog-title">
                                             <DialogTitle id="form-dialog-title">Select Exam</DialogTitle>
-                                            <Button>Confirm</Button>
+                                            <Button onClick={get_items_e}>Confirm</Button>
                                             <DialogContent>
-                                                <div style={{ height: 700, width: 1000 }}>
+                                                <div style={{ height: 400, width: 450 }}>
                                                     <DataGrid
                                                         rows={rows_exa}
                                                         columns={columns_exa}
                                                         checkboxSelection
                                                         disableSelectionOnClick
-                                                        onSelectionModelChange={e => setmedicals(e)}
+                                                        onSelectionModelChange={e => setExams(e)}
                                                     />
                                                 </div>
                                             </DialogContent>
@@ -352,22 +389,32 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                                     <div>
                                         <ListItem button key="Other" onClick={handleClickOpen_oth}><AddIcon></AddIcon>Other</ListItem>
                                         <Dialog open={open_oth} onClose={handleClose_oth} aria-labelledby="form-dialog-title">
-                                            <DialogTitle id="form-dialog-title">Select Exam</DialogTitle>
-                                            <Button>Confirm</Button>
+                                            <DialogTitle id="form-dialog-title">Select Other</DialogTitle>
+                                            <Button onClick={get_items_ot}>Confirm</Button>
                                             <DialogContent>
-                                                <div style={{ height: 700, width: 1000 }}>
+                                                <div style={{ height: 400, width: 450 }}>
                                                     <DataGrid
                                                         rows={rows_oth}
                                                         columns={columns_oth}
                                                         checkboxSelection
                                                         disableSelectionOnClick
-                                                        onSelectionModelChange={e => setmedicals(e)}
+                                                        onSelectionModelChange={e => setOthers(e)}
                                                     />
                                                 </div>
                                             </DialogContent>
                                         </Dialog>
                                     </div>
-                                    <ListItem button key="Other"><AddIcon></AddIcon>Custom</ListItem>
+                                    <ListItem button key="Custom" onClick={handleClickOpen_cust}><AddIcon></AddIcon>Custom</ListItem>
+                                    <Dialog open={open_cust} onClose={handleClose_cust} aria-labelledby="form-dialog-title">
+                                        <DialogTitle id="form-dialog-title">Add Custom Item</DialogTitle>
+                                        <DialogContent>
+                                            <form>
+                                            <TextField required id="standard-required" label="Description"/>
+                                            <TextField required id="standard-required" label="Amount" />
+                                            <Button>Confirm</Button>
+                                            </form>
+                                        </DialogContent>
+                                    </Dialog>
                                     <ListItem button key="Other"><SaveIcon></SaveIcon>SAVE</ListItem>
                                 </List>
                             </div>
@@ -377,12 +424,24 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                                         <TableHead>
                                             <TableRow>
                                                 <TableCell>Description</TableCell>
-                                                <TableCell>Qty</TableCell>
                                                 <TableCell>Amount</TableCell>
+                                                <TableCell>Qty</TableCell>
+                                                <TableCell>Delete</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {get_i}
+                                            {items?.map((x, y) => {
+                                                return (
+                                                    <TableRow>
+                                                        <TableCell>{prices?.find(p => p.id == x)?.list?.description}</TableCell>
+                                                        <TableCell>{prices?.find(p => p.id == x)?.price}</TableCell>
+                                                        <TableCell><select><option value="1"></option><option value="2"></option></select></TableCell>
+                                                        <TableCell>
+                                                            <Button onClick={() => delete_item(x)}>X</Button>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                )
+                                            })}
                                         </TableBody>
                                     </Table>
                                 </TableContainer>

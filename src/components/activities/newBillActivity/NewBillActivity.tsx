@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, FunctionComponent, useEffect, useRef, useState } from "react";
 import AppHeader from "../../accessories/appHeader/AppHeader";
 import Footer from "../../accessories/footer/Footer";
 import Button from "@material-ui/core/Button";
@@ -62,6 +62,11 @@ const NewBillActivity: FunctionComponent<TProps> = ({
     getPriceLists
 }) => {
     const { t } = useTranslation();
+    type Custom = {
+        id: number,
+        description: string,
+        amount: string,
+    }
 
     const breadcrumbMap = {
         [t("nav.dashboard")]: "/",
@@ -140,7 +145,7 @@ const NewBillActivity: FunctionComponent<TProps> = ({
     const [operations, setOperations] = React.useState<GridSelectionModel>([]);
     const [exams, setExams] = React.useState<GridSelectionModel>([]);
     const [others, setOthers] = React.useState<GridSelectionModel>([]);
-
+    const [custom, setCustom] = React.useState<Custom>();
     const get_items_m = () => {
         medicals?.forEach(function (i, j) {
             if (!(items.includes(i)))
@@ -166,11 +171,9 @@ const NewBillActivity: FunctionComponent<TProps> = ({
         })
     }
 
-    const body_item = () => {
-        items?.forEach(function (i, j) {
-            console.log("dai");
-            console.log(i);
-        })
+    const get_items_cust = () => {
+        const i: GridRowId = 2;
+        setItems(prevItems => [...prevItems, i]);
     }
 
     const delete_item = (e: GridRowId) => {
@@ -178,6 +181,28 @@ const NewBillActivity: FunctionComponent<TProps> = ({
         setItems(items.filter(item => e !== item));
     }
 
+
+
+    const get_input = (e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        const a = e.target.id as string;
+        console.log(a);
+
+        //setCustom({id:1, description:'ciao'});
+    }
+
+    const get_cust = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const desc = (e.currentTarget.elements[0] as HTMLInputElement).value as string;
+        const amo = (e.currentTarget.elements[1] as HTMLInputElement).value as string;
+        setCustom({ id: 1, description: desc, amount: amo });
+        console.log(custom);
+
+    }
+
+    const test = (e: React.MouseEvent<HTMLTableRowElement, MouseEvent>) => {
+        e.preventDefault();
+        console.log(e.currentTarget.cells[0]);
+    }
     //
     //
 
@@ -185,7 +210,7 @@ const NewBillActivity: FunctionComponent<TProps> = ({
     //  //  //  //  //  //
     // Gestione Grid MED//
     //  //  //  //  //  //
-    const columns_med: GridColDef[] = [
+    const columns_med = [
         { field: 'id', headerName: 'ID', width: 90 },
         {
             field: 'group',
@@ -201,13 +226,19 @@ const NewBillActivity: FunctionComponent<TProps> = ({
         },
     ];
 
-    const rows_med = [{}];
+    type row = [{
+        id: number | undefined,
+        group: string,
+        description: string | undefined
+    }];
+
+    let rows_med: row = [{ id: 0, group: '', description: '' }];
 
     prices?.forEach(function (m, i) {
         if (m.group === "MED")
             rows_med.push({ id: m.id, group: m.group, description: m.list?.description })
     })
-    rows_med.shift();
+    rows_med?.shift();
     //
     //
 
@@ -339,13 +370,25 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                                             <Button onClick={get_items_m}>Confirm</Button>
                                             <DialogContent>
                                                 <div style={{ height: 400, width: 450 }}>
-                                                    <DataGrid
-                                                        rows={rows_med}
-                                                        columns={columns_med}
-                                                        checkboxSelection
-                                                        disableSelectionOnClick
-                                                        onSelectionModelChange={e => setMedicals(e)}
-                                                    />
+                                                    <table>
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Type</th>
+                                                                <th scope="col">Description</th>
+                                                            </tr>
+                                                            <tbody>
+                                                                {rows_med?.map((r, i) => {
+                                                                    return (
+                                                                        <tr onClick={e => test(e)}>
+                                                                            <td title="type">{i + 1}</td>
+                                                                            <td title="type">{r.group}</td>
+                                                                            <td title="description">{r.description}</td>
+                                                                        </tr>
+                                                                    )
+                                                                })}
+                                                            </tbody>
+                                                        </thead>
+                                                    </table>
                                                 </div>
                                             </DialogContent>
                                         </Dialog>
@@ -372,18 +415,20 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                                         <ListItem button key="Exam" onClick={handleClickOpen_exa}><AddIcon></AddIcon>Exam</ListItem>
                                         <Dialog open={open_exa} onClose={handleClose_exa} aria-labelledby="form-dialog-title">
                                             <DialogTitle id="form-dialog-title">Select Exam</DialogTitle>
-                                            <Button onClick={get_items_e}>Confirm</Button>
-                                            <DialogContent>
-                                                <div style={{ height: 400, width: 450 }}>
-                                                    <DataGrid
-                                                        rows={rows_exa}
-                                                        columns={columns_exa}
-                                                        checkboxSelection
-                                                        disableSelectionOnClick
-                                                        onSelectionModelChange={e => setExams(e)}
-                                                    />
-                                                </div>
-                                            </DialogContent>
+                                            <form>
+                                                <Button type="submit">Confirm</Button>
+                                                <DialogContent>
+                                                    <div style={{ height: 400, width: 450 }}>
+                                                        <DataGrid
+                                                            rows={rows_exa}
+                                                            columns={columns_exa}
+                                                            checkboxSelection
+                                                            disableSelectionOnClick
+                                                            onSelectionModelChange={e => setExams(e)}
+                                                        />
+                                                    </div>
+                                                </DialogContent>
+                                            </form>
                                         </Dialog>
                                     </div>
                                     <div>
@@ -406,12 +451,12 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                                     </div>
                                     <ListItem button key="Custom" onClick={handleClickOpen_cust}><AddIcon></AddIcon>Custom</ListItem>
                                     <Dialog open={open_cust} onClose={handleClose_cust} aria-labelledby="form-dialog-title">
-                                        <DialogTitle id="form-dialog-title">Add Custom Item</DialogTitle>
+                                        <DialogTitle id="form-dialog-title">Add custom Item</DialogTitle>
                                         <DialogContent>
-                                            <form>
-                                            <TextField required id="standard-required" label="Description"/>
-                                            <TextField required id="standard-required" label="Amount" />
-                                            <Button>Confirm</Button>
+                                            <form onSubmit={e => get_cust(e)}>
+                                                <TextField required id="description" label="Description" />
+                                                <TextField required id="amount" label="Amount" />
+                                                <Button type="submit">Confirm</Button>
                                             </form>
                                         </DialogContent>
                                     </Dialog>
@@ -433,8 +478,8 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                                             {items?.map((x, y) => {
                                                 return (
                                                     <TableRow>
-                                                        <TableCell>{prices?.find(p => p.id == x)?.list?.description}</TableCell>
-                                                        <TableCell>{prices?.find(p => p.id == x)?.price}</TableCell>
+                                                        <TableCell>{x ? custom?.description : prices?.find(p => p.id == x)?.list?.description === ""}</TableCell>
+                                                        <TableCell>{x ? custom?.amount : prices?.find(p => p.id == x)?.price}</TableCell>
                                                         <TableCell><select><option value="1"></option><option value="2"></option></select></TableCell>
                                                         <TableCell>
                                                             <Button onClick={() => delete_item(x)}>X</Button>

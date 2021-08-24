@@ -1,7 +1,6 @@
-export const CREATE_BILL_LOADING = "bills/CREATE_BILL_LOADING";
-export const CREATE_BILL_SUCCESS = "bills/CREATE_BILL_SUCCESS";
-export const CREATE_BILL_FAIL = "bills/CREATE_BILL_FAIL";
-export const CREATE_BILL_RESET = "bills/CREATE_BILL_RESET";
+export const NEW_BILL_LOADING = "bills/NEW_BILL_LOADING";
+export const NEW_BILL_SUCCESS = "bills/NEW_BILL_SUCCESS";
+export const NEW_BILL_FAIL = "bills/NEW_BILL_FAIL";
 
 export const SEARCH_BILL_LOADING = "bills/SEARCH_BILL_LOADING";
 export const SEARCH_BILL_SUCCESS = "bills/SEARCH_BILL_SUCCESS";

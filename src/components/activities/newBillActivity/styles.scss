@@ -42,15 +42,15 @@
   }
 
   .newBill__panel {
-    display: grid;;
+    display: grid;
+    grid-template-columns: 1fr 0.2fr;
+    grid-gap: 20px;
+    overflow:hidden;
     flex-direction: column;
-    position:relative;
-    align-items: center;
     background-color: $c-white;
     border-radius: 10px;
     box-shadow: 0 4px 8px 0 rgba(48, 49, 51, 0.1);
     margin: 20px 80px 60px 80px;
-    overflow: hidden;
     @include susy-media($tablet_port) {
       font-size: x-large;
     }
@@ -59,43 +59,53 @@
       font-size: x-large;
     }
   }
+  
 
-  .newBill_Head {
-    position: sticky;
-  }
+  .billPanel {
+    .newBill_Date_Pat {
+      margin-top: 10px;
+      margin-left: 10px;
+      height: auto;
+      .bill_SelectPat {
+        height: 50px;
+        margin-left: 35px;
+      }
+    }
 
-  .newBill_Date_Pat {
-    margin-top: 10px;
-    margin-left: 10px;
-    width: 95%;
-    .bill_SelectPat {
-      height: 50px;
-      margin-left: 35px;
+    .newBill_InputPat {
+      display: inline-block;
+      margin-top: 10px;
+      margin-left: 10px;
+      margin-bottom: 5px;
+      .patient_input {
+        margin-left: 15px;
+        width:40%;
+      }
+    }
+
+    .newBill_Rows {
+      margin-top: 15px;
+      margin-left: 5px;
+      margin-bottom: 15px;
+      width: 100%;
+      min-height: 250px;
+    }
+
+    .buttonBillSubmit {
+      margin-left: 30px;
+      width: 30%;
     }
   }
-  .newBill_InputPat {
-    display: inline-block;
-    margin-top: 10px;
-    margin-left: 10px;
-    margin-bottom: 10px;
-    width: 80%;
-    .patient_input {
-      margin-left: 15px;
-      width:80%;
+
+  .bill_Drawer {
+    .billListDrawer{
+      width:10%;
+    }
+    .billItemDrawer {
+      width:10%;
     }
   }
 
-  .newBill_Drawer {
-    float: right;
-    margin-right: 80px;
-  }
-
-  .newBill_Rows {
-    margin-top: 15px;
-    margin-left: 5px;
-    margin-bottom: 15px;
-    width: 80%;
-  }
 
 
   .footer {

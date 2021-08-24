@@ -40,7 +40,7 @@ export interface BillDTO {
      * @type {boolean}
      * @memberof BillDTO
      */
-    patient?: boolean;
+    patientTrue?: boolean;
     /**
      * @type {PatientDTO}
      * @memberof BillDTO

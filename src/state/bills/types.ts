@@ -1,7 +1,8 @@
 import { BillDTO } from "../../generated";
+import { FullBillDTO } from "../../generated";
 import { IApiResponse } from "../types";
 
 export type IBillsState = {
-  createBill: IApiResponse<null>;
+  newBill: IApiResponse<FullBillDTO>;
   getBill: IApiResponse<BillDTO>;
 };

@@ -1,21 +1,33 @@
-import { BillDTO } from "../../../generated";
+import { Dispatch, SetStateAction } from "react";
+import { BillDTO, PatientDTO } from "../../../generated";
+import { BillItemsDTO } from "../../../generated";
 import { PriceDTO } from "../../../generated";
 import { PriceListDTO } from "../../../generated";
 import { MedicalDTO } from "../../../generated";
 import { FullBillDTO } from "../../../generated";
 import { TUserCredentials } from "../../../state/main/types";
-import { IAction, TAPIResponseStatus } from "../../../state/types";
-
+import {TAPIResponseStatus } from "../../../state/types";
 
 interface IOwnProps {
     billHomeRoute: string;
   }
 
+//
+  //Interface used for share variable prices and item-setItem
+  //between child and father
+//
+export interface PricesState {
+  prices: Array<PriceDTO> | undefined;
+  items: BillItemsDTO[];
+  setItems: Dispatch<SetStateAction<BillItemsDTO[]>>;
+}
+
+export interface ItemsState {
+  items: Array<Item> | undefined;
+}
+
 export interface IStateProps {
     userCredentials: TUserCredentials;
-    isLoading: boolean;
-    hasSucceeded: boolean;
-    hasFailed: boolean;
     med: Array<MedicalDTO> | undefined;
     bill: BillDTO | undefined;
     prices: Array<PriceDTO> | undefined;
@@ -24,9 +36,7 @@ export interface IStateProps {
 }
 
 export interface IDispatchProps {
-    createBill: (bill : FullBillDTO) => any;
-    createBillReset: () => any;
-    getBill: (code: number) => any;
+    newBill: (newBillDto: FullBillDTO) => any;
     getPrices: () => any;
     getMedicals: () => any;
     getPriceLists: () => any;
@@ -34,15 +44,18 @@ export interface IDispatchProps {
 
 export type TProps = IOwnProps & IStateProps & IDispatchProps;
 
-export type TValues = Record<TFieldName, string>;
-
-export type TFieldName =
-  | "id"
-  | "firstName"
-  | "secondName"
-  | "birthDate"
-  | "address";
-
+export type Item = {
+  "hashCode": number | undefined,
+  "id": number | undefined,
+  "price": boolean | undefined,
+  "billId": number | undefined,
+  "priceId": number | undefined,
+  "itemDescription": string | undefined,
+  "itemAmount": number | undefined,
+  "itemQuantity": number | undefined,
+  "itemDisplayCode": string | undefined,
+  "itemId": number | undefined,
+}
 
 
 export type TActivityTransitionState = "IDLE" | "TO_PATIENT_DETAILS";

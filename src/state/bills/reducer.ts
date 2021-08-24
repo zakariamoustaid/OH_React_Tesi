@@ -1,10 +1,9 @@
 import produce from "immer";
 import { IAction } from "../types";
 import {
-    CREATE_BILL_FAIL,
-    CREATE_BILL_LOADING,
-    CREATE_BILL_RESET,
-    CREATE_BILL_SUCCESS,
+    NEW_BILL_FAIL,
+    NEW_BILL_LOADING,
+    NEW_BILL_SUCCESS,
     GET_BILL_SUCCESS,
     GET_BILL_LOADING,
     GET_BILL_FAIL
@@ -16,28 +15,22 @@ export default produce((draft: IBillsState, action: IAction<any, any>) => {
     switch (action.type) {
 
         /**
-         * CREATE_BILL
+         * NEW_BILL
          */
-        case CREATE_BILL_LOADING: {
-            draft.createBill.status = "LOADING";
+        case NEW_BILL_LOADING: {
+            draft.newBill.status = "LOADING";
             break;
         }
 
-        case CREATE_BILL_SUCCESS: {
-            draft.createBill.status = "SUCCESS";
-            delete draft.createBill.error;
+        case NEW_BILL_SUCCESS: {
+            draft.newBill.status = "SUCCESS";
+            delete draft.newBill.error;
             break;
         }
 
-        case CREATE_BILL_FAIL: {
-            draft.createBill.status = "FAIL";
-            draft.createBill.error = action.error;
-            break;
-        }
-
-        case CREATE_BILL_RESET: {
-            draft.createBill.status = "IDLE";
-            delete draft.createBill.error;
+        case NEW_BILL_FAIL: {
+            draft.newBill.status = "FAIL";
+            draft.newBill.error = action.error;
             break;
         }
 

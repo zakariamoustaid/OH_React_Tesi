@@ -28,18 +28,11 @@ export interface ItemsState {
 
 export interface IStateProps {
     userCredentials: TUserCredentials;
-    med: Array<MedicalDTO> | undefined;
-    bill: BillDTO | undefined;
     prices: Array<PriceDTO> | undefined;
-    getMedStat: TAPIResponseStatus;
-    priceLists: Array<PriceListDTO> | undefined;
 }
 
 export interface IDispatchProps {
-    newBill: (newBillDto: FullBillDTO) => any;
     getPrices: () => any;
-    getMedicals: () => any;
-    getPriceLists: () => any;
 }
 
 export type TProps = IOwnProps & IStateProps & IDispatchProps;

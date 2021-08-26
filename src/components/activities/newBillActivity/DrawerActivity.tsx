@@ -7,8 +7,10 @@ import List from '@material-ui/core/List';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import AddIcon from '@material-ui/icons/Add';
-import SaveIcon from '@material-ui/icons/Save';
+import FormControl from '@material-ui/core/FormControl';
+import TextField from '@material-ui/core/TextField';
 import { PricesState, Item } from "./types";
+import "./styles.scss";
 
 
 const DrawerActivity: FunctionComponent<PricesState> = ({
@@ -21,11 +23,11 @@ const DrawerActivity: FunctionComponent<PricesState> = ({
     const [open_ope, setOpen_ope] = React.useState(false);
     const [open_exa, setOpen_exa] = React.useState(false);
     const [open_oth, setOpen_oth] = React.useState(false);
+    const [open_cust, setOpen_cust] = React.useState(false);
 
-
-//
+    //
     //management open/close modals
-//
+    //
     const handleClickOpen_med = () => {
         setOpen_med(true);
     };
@@ -54,9 +56,16 @@ const DrawerActivity: FunctionComponent<PricesState> = ({
         setOpen_oth(false);
     };
 
-//
+    const handleClickOpen_cust = () => {
+        setOpen_cust(true);
+    };
+    const handleClose_cust = () => {
+        setOpen_cust(false);
+    };
+
+    //
     //management modals' columns and rows
-//
+    //
     const columns = [
         { field: 'id', headerName: 'ID', width: 90 },
         {
@@ -124,9 +133,9 @@ const DrawerActivity: FunctionComponent<PricesState> = ({
         select?.forEach(function (i, j) {
             //if-else case to check if item is already in the bill
             if ((items?.some(it => it.hashCode === i)) === true) {
-                items?.forEach(function (x) {
-                    if (x.id === i)
-                        console.log("I tried to sum the amount of item but in typeScript is pretty tricky")
+                items.forEach(function (x) {
+                    //x.itemQuantity++;
+                    console.log("How to solve the typescript messagge: Object is possibly 'undefined'?")
                 })
             }
             else {
@@ -142,17 +151,55 @@ const DrawerActivity: FunctionComponent<PricesState> = ({
                         "itemAmount": 1,
                         "itemQuantity": 1,
                         "itemDisplayCode": "test",
-                        "itemId": "prices?.find(p => p.id == i)?.id",
-                        
+                        "itemId": "1",
                     }])
             }
         })
     }
 
+    //
+    //Manage Custom insert
+    //
+
+    const [description_cust, setDescription_cust] = useState('');
+    const [itemQ_cust, setItemQ_cust] = useState(0);
+
+
+    const handleDescription = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        e.preventDefault();
+        setDescription_cust(e.currentTarget.value);
+    }
+
+    const handleItemQ = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        e.preventDefault();
+        setItemQ_cust(Number(e.currentTarget.value));
+    }
+
+    const confirm_cust = () => {
+        if (itemQ_cust !== 0 && description_cust !== '')
+            setItems(pre =>
+                [...pre,
+                {
+                    "hashCode": 1,
+                    "id": 1,
+                    "price": true,
+                    "billId": 1,
+                    "priceId": "test",
+                    "itemDescription": description_cust,
+                    "itemAmount": 1,
+                    "itemQuantity": itemQ_cust,
+                    "itemDisplayCode": "test",
+                    "itemId": "1",
+
+                }])
+            setItemQ_cust(0);
+            setDescription_cust('');
+    }
+
 
     return (
         <List className="billListDrawer">
-            <ListItem  button key="Medical" onClick={handleClickOpen_med}><AddIcon></AddIcon>Medical</ListItem>
+            <ListItem button key="Medical" onClick={handleClickOpen_med}><AddIcon></AddIcon>Medical</ListItem>
             <Dialog className="billItemDrawer" open={open_med} onClose={handleClose_med} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">Select Medical</DialogTitle>
                 <Button onClick={take_items}>Confirm</Button>
@@ -213,6 +260,26 @@ const DrawerActivity: FunctionComponent<PricesState> = ({
                             disableSelectionOnClick
                             onSelectionModelChange={e => setSelect(e)}
                         />
+                    </div>
+                </DialogContent>
+            </Dialog>
+            <ListItem button key="Custom" onClick={handleClickOpen_cust}><AddIcon></AddIcon>Custom</ListItem>
+            <Dialog open={open_cust} onClose={handleClose_cust} aria-labelledby="form-dialog-title">
+                <DialogTitle id="form-dialog-title">Select Other</DialogTitle>
+                <Button onClick={confirm_cust}>Confirm</Button>
+                <DialogContent>
+                    <div style={{ height: 200, width: 450 }}>
+                        <FormControl onSubmit={confirm_cust}>
+                            <div className="Description" style={{ marginBottom: 50 }}>
+                                <TextField required id="standard-required" label="Description" onChange={e => handleDescription(e)} />
+                            </div>
+                            <div className="Item_quantity" style={{ marginBottom: 10 }}>
+                                <TextField required id="standard-required" label="Item_quantity" type="number"
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }} onChange={e => handleItemQ(e)} />
+                            </div>
+                        </FormControl>
                     </div>
                 </DialogContent>
             </Dialog>

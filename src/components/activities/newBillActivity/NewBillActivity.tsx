@@ -13,75 +13,78 @@ import Paper from '@material-ui/core/Paper';
 import { useTranslation } from "react-i18next";
 import { connect } from "react-redux";
 import { IState } from "../../../types";
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Dialog from '@material-ui/core/Dialog';
 import "./styles.scss";
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import {
-    newBill,
-    getBill,
-} from "../../../state/bills/actions";
-import {
     getPrices,
-    getPriceLists
 } from "../../../state/prices/actions"
-import {
-    getMedicals,
-} from "../../../state/medicals/actions"
 import {
     IDispatchProps,
     IStateProps,
     TProps,
-    Item,
 } from "./types";
 import DrawerActivity from "./DrawerActivity";
 import { BillDTO, BillItemsDTO, FullBillDTO, PatientDTO } from "../../../generated";
+import TextField from "@material-ui/core/TextField";
 
 
 const NewBillActivity: FunctionComponent<TProps> = ({
     userCredentials,
-    billHomeRoute,
-    med,
-    getMedicals,
-    getMedStat,
-    bill,
-    newBill,
     prices,
     getPrices,
-    priceLists,
-    getPriceLists,
 }) => {
 
     const { t } = useTranslation();
-    type Custom = {
-        id: number,
-        description: string,
-        amount: string,
-    }
-
-
 
     const breadcrumbMap = {
         [t("nav.dashboard")]: "/",
         [t("nav.billing")]: "/billing",
         [t("nav.newbill")]: "/bills",
     };
-    useEffect(() => {
-        getMedicals();
-    }, []);
 
-
+    //get prices/list
     useEffect(() => {
         getPrices();
     }, []);
 
 
-    //
-    //get patient
-    //
-    const [patient, setPatient] = useState<PatientDTO>();
+    const [items, setItems] = React.useState<BillItemsDTO[]>([]);
 
+    //  //  //  //  //
+    //  GET TOKEN   //
+    //  //  //  //  //
+    const [token_auth, setToken] = useState('');
     useEffect(() => {
+        const url = "https://www.open-hospital.org/oh11-api/auth/login?password=admin&username=admin";
+        const cont_t = 'application/json'
+        const acc = "*/*";
+
+        const fetchDataTok = async () => {
+            try {
+                const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': cont_t, 'Accept': acc} });
+                const json = await response.json();
+                setToken(json.token)
+
+            } catch (error) {
+                console.log("error", error);
+            }
+        };
+        fetchDataTok();
+    }, []);
+
+
+    //  //  //  //  //
+    //  GET PATIENT //
+    //  //  //  //  //
+    const [pat, setPatient] = useState<PatientDTO>();
+
+    const getPat = (e:React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
         const url = "https://www.open-hospital.org/oh11-api/patients?page=1&size=1";
-        const auth = "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImF1dGgiOiJhZG1pbiIsImV4cCI6MTYyOTgxNjE2Mn0.uouPZE9Vrc8dYUA78RsVFQ0aui9zjcwokXndi3C6o1wC3xoEvyG68THiFyZ-wH7Z6RAtvmJa8MmYvZR3iMIutQ";
+        const auth = "Bearer "+token_auth;
         const acc = "application/json";
 
         const fetchData = async () => {
@@ -89,23 +92,58 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                 const response = await fetch(url, { method: 'GET', headers: { Accept: acc, Authorization: auth } });
                 const json = await response.json();
                 setPatient(json[0])
-
             } catch (error) {
                 console.log("error", error);
             }
         };
         fetchData();
-    }, []);
+    };
+    const patient_data = pat?.firstName + " " + pat?.secondName;
 
-    const patient_data = patient?.firstName + " " + patient?.secondName;
+    //GET DATE
+    const [date, setDate] = useState('');
+    const get_date = (e:React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        e.preventDefault();
+        setDate(e.currentTarget.value)
+    }
 
 
+    const [createBill, setCreateBill] = React.useState<BillDTO>();
+    
 
-    //delete an item from bill
+    //  //  //  //  //
+    // CREATE BILL  //
+    //  //  //  //  //
+    const [openConferm, setOpenConferm] = useState(false);
+    const handleClickOpenConferm = () => {
+        setCreateBill({
+            id: 0,
+            list: true,
+            listId: 0,
+            patient: pat,
+            date: date,
+            update: date,
+            listName: "Basic",
+            patientTrue: true,
+            patName: pat?.firstName + " " + pat?.secondName,
+            status: "O",
+            amount: 1000,
+            balance: 1500,
+            user: "admin",
+        });
+        setOpenConferm(true);
+    };
+
+    const handleCloseConferm = () => {
+        setOpenConferm(false);
+    };
+
+    //  //  //  //  //
+    //  DELETE ITEM //
+    //  //  //  //  //
     const delete_item = (e: BillItemsDTO) => {
         setItems(items.filter(item => e !== item));
     }
-    const [items, setItems] = React.useState<BillItemsDTO[]>([]);
 
     const test = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
@@ -117,41 +155,40 @@ const NewBillActivity: FunctionComponent<TProps> = ({
     //  CREATE BILL //
 
     //  //  //  //  //
-    const [createBill, setCreateBill] = React.useState<BillDTO>();
-    setCreateBill({
-        id: 0,
-        list: true,
-        listId: 0,
-        patientDTO: patient,
-        date: "2020-03-19T14:58:00.000Z",
-        update: "2020-03-19T14:58:00.000Z",
-        listName: "Basic",
-        patientTrue: true,
-        patName: patient?.firstName,
-        status: "O",
-        amount: 1000,
-        balance: 1500,
-        user: "admin",
-    });
+
+    const [fullBill, setFullBill] = React.useState<FullBillDTO>();
 
     const saveBill = () => {
-        const fullBill : FullBillDTO = {
-            billDTO: createBill,
-            billItemsDTO: items,
-            billPaymentsDTO: {
+
+        setFullBill({
+            bill: createBill,
+            billItems: items,
+            billPayments: [{
                 id: 0,
                 billId: 0,
                 date: "2020-03-19T14:58:00.000Z",
-                amount: 500,
+                amount: 0,
                 user: "admin"
-              }
-        }
+            }]
+        });
+
+        fetch('https://www.open-hospital.org/oh11-api/bills', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': 'Bearer '+token_auth,
+            },
+            body: JSON.stringify(fullBill),
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log("SUCCESS");
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     }
-
-
-
-
-
 
     return (
         <div className="new_Bill">
@@ -167,7 +204,7 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                             <form>
                                 <div className="newBill_Head">
                                     <div className="newBill_Date_Pat">
-                                        <TextData
+                                        <TextField
                                             className='bill_Date'
                                             id="date"
                                             label="SELECT DATE"
@@ -176,12 +213,13 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                                             InputLabelProps={{
                                                 shrink: true,
                                             }}
+                                            onChange={e => get_date(e)}
                                         />
-                                        <Button type="submit" className='bill_SelectPat' onClick={e => test(e)} variant="outlined">find Patient</Button>
+                                        <Button type="submit" className='bill_SelectPat' onClick={e => getPat(e)} variant="outlined">find Patient</Button>
                                     </div>
                                     <div className="newBill_InputPat">
                                         <label>Patient</label><span></span><input className="patient_input" value={patient_data} disabled ></input>
-                                        <Button className="buttonBillSubmit" onClick={saveBill}>SAVE</Button>
+                                        <Button className="buttonBillSubmit" onClick={handleClickOpenConferm}>SAVE</Button>
                                     </div>
 
                                 </div>
@@ -216,6 +254,15 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                         </div>
                         <div className="bill_Drawer">
                             <DrawerActivity prices={prices} items={items} setItems={setItems} />
+                            <Dialog open={openConferm} onClose={handleCloseConferm} aria-labelledby="form-dialog-title">
+                                <DialogTitle id="form-dialog-title">Confirm Message</DialogTitle>
+                                <Button color="primary" size="large" onClick={saveBill} >Confirm</Button>
+                                <Button color="secondary" size="large" onClick={handleCloseConferm} >Cancel</Button>
+                                <DialogContent>
+                                    <div style={{ height: 30, width: 250 }}>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
                         </div>
                     </div>
                 </div>
@@ -228,21 +275,12 @@ const NewBillActivity: FunctionComponent<TProps> = ({
 
 const mapStateToProps = (state: IState): IStateProps => ({
     userCredentials: state.main.authentication.data,
-    bill: state.bills.getBill.data,
-    med: state.medicals.medicalsOrderByName.data,
     prices: state.prices.getPrices.data,
-    getMedStat: state.medicals.medicalsOrderByName.status || "IDLE",
-    priceLists: state.prices.getPriceLists.data
 });
 
 
-
-
 const mapDispatchToProps: IDispatchProps = {
-    newBill,
-    getMedicals,
     getPrices,
-    getPriceLists
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(NewBillActivity);

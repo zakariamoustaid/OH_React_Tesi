@@ -26,15 +26,15 @@ export interface FullBillDTO {
      * @type {BillDTO}
      * @memberof FullBillDTO
      */
-    billDTO?: BillDTO;
+    bill?: BillDTO;
     /**
      * @type {Array<BillItemsDTO>}
      * @memberof FullBillDTO
      */
-    billItemsDTO?: Array<BillItemsDTO>;
+    billItems?: Array<BillItemsDTO>;
     /**
      * @type {Array<BillPaymentsDTO>}
      * @memberof FullBillDTO
      */
-    billPaymentsDTO?: Array<BillPaymentsDTO>;
+    billPayments?: Array<BillPaymentsDTO>;
 }

@@ -43,7 +43,7 @@
 
   .newBill__panel {
     display: grid;
-    grid-template-columns: 1fr 0.2fr;
+    grid-template-columns: 5fr 1fr;
     grid-gap: 20px;
     overflow:hidden;
     flex-direction: column;
@@ -98,12 +98,7 @@
   }
 
   .bill_Drawer {
-    .billListDrawer{
-      width:10%;
-    }
-    .billItemDrawer {
-      width:10%;
-    }
+    width:100%;
   }
 
 

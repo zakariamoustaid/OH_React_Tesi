@@ -45,7 +45,7 @@ export interface BillDTO {
      * @type {PatientDTO}
      * @memberof BillDTO
      */
-    patientDTO?: PatientDTO;
+    patient?: PatientDTO;
     /**
      * Date of bill creation
      * @type {string}

@@ -4,6 +4,7 @@ import {
     NEW_BILL_FAIL,
     NEW_BILL_LOADING,
     NEW_BILL_SUCCESS,
+    NEW_BILL_RESET,
     GET_BILL_SUCCESS,
     GET_BILL_LOADING,
     GET_BILL_FAIL
@@ -33,6 +34,13 @@ export default produce((draft: IBillsState, action: IAction<any, any>) => {
             draft.newBill.error = action.error;
             break;
         }
+
+        case NEW_BILL_RESET: {
+          draft.newBill.status = "IDLE";
+          delete draft.newBill.error;
+          break;
+        }
+  
 
         case GET_BILL_LOADING: {
             draft.getBill.status = "LOADING";

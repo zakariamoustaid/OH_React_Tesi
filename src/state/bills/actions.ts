@@ -12,6 +12,7 @@ import {
   NEW_BILL_FAIL,
   NEW_BILL_LOADING,
   NEW_BILL_SUCCESS,
+  NEW_BILL_RESET,
   SEARCH_BILL_FAIL,
   SEARCH_BILL_LOADING,
   SEARCH_BILL_SUCCESS,
@@ -26,26 +27,34 @@ const billControllerApi = new BillControllerApi(
 
 export const newBill =
   (newBillDto: FullBillDTO) =>
-  (dispatch: Dispatch<IAction<null, {}>>): void => {
-    dispatch({
-      type: NEW_BILL_LOADING,
-    });
+    (dispatch: Dispatch<IAction<null, {}>>): void => {
+      dispatch({
+        type: NEW_BILL_LOADING,
+      });
 
-    billControllerApi.newBillUsingPOST({ newBillDto }).subscribe(
-      (payload) => {
-        dispatch({
-          type: NEW_BILL_SUCCESS,
-          payload: payload,
-        });
-      },
-      (error) => {
-        dispatch({
-          type: NEW_BILL_FAIL,
-          error: error,
-        });
-      }
-    );
-  };
+      billControllerApi.newBillUsingPOST({ newBillDto }).subscribe(
+        (payload) => {
+          dispatch({
+            type: NEW_BILL_SUCCESS,
+            payload: payload,
+          });
+        },
+        (error) => {
+          dispatch({
+            type: NEW_BILL_FAIL,
+            error: error,
+          });
+        }
+      );
+    };
+
+export const newBillReset =
+  () =>
+    (dispatch: Dispatch<IAction<null, {}>>): void => {
+      dispatch({
+        type: NEW_BILL_RESET,
+      });
+    };
 
 
 export const getBill =
@@ -55,24 +64,24 @@ export const getBill =
         type: GET_BILL_LOADING,
       });
       billControllerApi.getBillUsingGET({ id: code }).subscribe(
-          (payload) => {
-            if (typeof payload === "object" && !isEmpty(payload)) {
-              dispatch({
-                type: GET_BILL_SUCCESS,
-                payload: payload,
-              });
-            } else {
-              dispatch({
-                type: GET_BILL_SUCCESS,
-                payload: [],
-              });
-            }
-          },
-          (error) => {
+        (payload) => {
+          if (typeof payload === "object" && !isEmpty(payload)) {
             dispatch({
-              type: GET_BILL_FAIL,
-              error,
+              type: GET_BILL_SUCCESS,
+              payload: payload,
+            });
+          } else {
+            dispatch({
+              type: GET_BILL_SUCCESS,
+              payload: [],
             });
           }
-        );
+        },
+        (error) => {
+          dispatch({
+            type: GET_BILL_FAIL,
+            error,
+          });
+        }
+      );
     };

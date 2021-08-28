@@ -31,7 +31,7 @@ export function makeServer() {
     therapyRoutes(server);
     opdRoutes(server);
     diseasesRoutes(server);
-    //pricesRoutes(server);
+    pricesRoutes(server);
     //billRoutes(server);
     //medicalRoutes(server);
   });

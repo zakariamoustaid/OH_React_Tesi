@@ -1,20 +1,21 @@
 import { Dispatch, SetStateAction } from "react";
-import { BillDTO, PatientDTO } from "../../../generated";
-import { BillItemsDTO } from "../../../generated";
+import { BillItemsDTO, FullBillDTO } from "../../../generated";
 import { PriceDTO } from "../../../generated";
-import { PriceListDTO } from "../../../generated";
-import { MedicalDTO } from "../../../generated";
-import { FullBillDTO } from "../../../generated";
+import {
+  PatientDTOFatherEnum, PatientDTOHasInsuranceEnum,
+  PatientDTOMotherEnum, PatientDTOParentTogetherEnum,
+  PatientDTOSexEnum} from "../../../generated";
 import { TUserCredentials } from "../../../state/main/types";
-import {TAPIResponseStatus } from "../../../state/types";
+
 
 interface IOwnProps {
-    billHomeRoute: string;
-  }
+  billHomeRoute: string;
+  dashboardRoute: string;
+}
 
 //
-  //Interface used for share variable prices and item-setItem
-  //between child and father
+//Interface used for share variable prices and item-setItem
+//between child and father
 //
 export interface PricesState {
   prices: Array<PriceDTO> | undefined;
@@ -27,13 +28,19 @@ export interface ItemsState {
 }
 
 export interface IStateProps {
-    userCredentials: TUserCredentials;
-    prices: Array<PriceDTO> | undefined;
+  userCredentials: TUserCredentials;
+  prices: Array<PriceDTO> | undefined;
+  isLoading: boolean;
+  hasSucceeded: boolean;
+  hasFailed: boolean;
 }
 
 export interface IDispatchProps {
-    getPrices: () => any;
+  getPrices: () => any;
+  newBill: (bill: FullBillDTO) => any;
+  newBillReset: () => any;
 }
+
 
 export type TProps = IOwnProps & IStateProps & IDispatchProps;
 
@@ -50,5 +57,4 @@ export type Item = {
   "itemId": number | undefined,
 }
 
-
-export type TActivityTransitionState = "IDLE" | "TO_PATIENT_DETAILS";
+export type TActivityTransitionState = "IDLE" | "TO_BILL_HOME" | "TO_DASHBOARD";

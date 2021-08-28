@@ -1,4 +1,5 @@
 import React, { ChangeEvent, Children, FunctionComponent, useEffect, useRef, useState } from "react";
+import { Redirect } from "react-router";
 import AppHeader from "../../accessories/appHeader/AppHeader";
 import Footer from "../../accessories/footer/Footer";
 import Button from "@material-ui/core/Button";
@@ -12,29 +13,42 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { useTranslation } from "react-i18next";
 import { connect } from "react-redux";
+import checkIcon from "../../../assets/check-icon.png";
 import { IState } from "../../../types";
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
+import Alert from '@material-ui/lab/Alert';
 import "./styles.scss";
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import {
     getPrices,
 } from "../../../state/prices/actions"
 import {
+    newBill,
+    newBillReset
+} from "../../../state/bills/actions";
+import {
     IDispatchProps,
     IStateProps,
     TProps,
+    TActivityTransitionState
 } from "./types";
 import DrawerActivity from "./DrawerActivity";
 import { BillDTO, BillItemsDTO, FullBillDTO, PatientDTO } from "../../../generated";
 import TextField from "@material-ui/core/TextField";
-
+import ConfirmationDialog from "../../accessories/confirmationDialog/ConfirmationDialog";
 
 const NewBillActivity: FunctionComponent<TProps> = ({
     userCredentials,
     prices,
     getPrices,
+    newBill,
+    newBillReset,
+    hasFailed,
+    hasSucceeded,
+    isLoading,
+    dashboardRoute
 }) => {
 
     const { t } = useTranslation();
@@ -50,8 +64,21 @@ const NewBillActivity: FunctionComponent<TProps> = ({
         getPrices();
     }, []);
 
-
     const [items, setItems] = React.useState<BillItemsDTO[]>([]);
+
+    const [activityTransitionState, setActivityTransitionState] =
+        useState<TActivityTransitionState>("IDLE");
+
+    const [billComplete, setBillComplete] = useState(false);
+
+    useEffect(() => {
+        if (
+          activityTransitionState === "TO_BILL_HOME" ||
+          activityTransitionState === "TO_DASHBOARD"
+        ) {
+            newBillReset();
+        }
+      }, [activityTransitionState]);
 
     //  //  //  //  //
     //  GET TOKEN   //
@@ -64,10 +91,9 @@ const NewBillActivity: FunctionComponent<TProps> = ({
 
         const fetchDataTok = async () => {
             try {
-                const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': cont_t, 'Accept': acc} });
+                const response = await fetch(url, { method: 'POST', headers: { 'Content-Type': cont_t, 'Accept': acc } });
                 const json = await response.json();
                 setToken(json.token)
-
             } catch (error) {
                 console.log("error", error);
             }
@@ -80,11 +106,10 @@ const NewBillActivity: FunctionComponent<TProps> = ({
     //  GET PATIENT //
     //  //  //  //  //
     const [pat, setPatient] = useState<PatientDTO>();
-
-    const getPat = (e:React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const getPat = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
         const url = "https://www.open-hospital.org/oh11-api/patients?page=1&size=1";
-        const auth = "Bearer "+token_auth;
+        const auth = "Bearer " + token_auth;
         const acc = "application/json";
 
         const fetchData = async () => {
@@ -98,42 +123,58 @@ const NewBillActivity: FunctionComponent<TProps> = ({
         };
         fetchData();
     };
-    const patient_data = pat?.firstName + " " + pat?.secondName;
 
-    //GET DATE
-    const [date, setDate] = useState('');
-    const get_date = (e:React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
-        e.preventDefault();
-        setDate(e.currentTarget.value)
-    }
+    const patient_data = pat?.firstName + " " + pat?.secondName;
 
 
     const [createBill, setCreateBill] = React.useState<BillDTO>();
-    
+
+    //GET DATE
+    const [date, setDate] = useState('');
+    const get_date = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        e.preventDefault();
+        setDate(e.currentTarget.value);
+    }
+
+    //Set patient and date
+    useEffect(() => {
+        if (date !== undefined && pat !== undefined)
+            setCreateBill({
+                id: 0,
+                list: true,
+                listId: 0,
+                patient: pat,
+                date: date,
+                update: date,
+                listName: "Basic",
+                patientTrue: true,
+                patName: pat?.firstName + " " + pat?.secondName,
+                status: "O",
+                amount: 1000,
+                balance: 1500,
+                user: "admin",
+            });
+
+    }, [date, pat])
 
     //  //  //  //  //
     // CREATE BILL  //
     //  //  //  //  //
+    const [fullBill, setFullBill] = React.useState<FullBillDTO>();
+    useEffect(() => {
+        if (createBill !== undefined && items !== undefined) {
+            setFullBill({
+                bill: createBill,
+                billItems: items,
+                billPayments: []
+            });
+        }
+    }, [createBill, items]);
+
     const [openConferm, setOpenConferm] = useState(false);
     const handleClickOpenConferm = () => {
-        setCreateBill({
-            id: 0,
-            list: true,
-            listId: 0,
-            patient: pat,
-            date: date,
-            update: date,
-            listName: "Basic",
-            patientTrue: true,
-            patName: pat?.firstName + " " + pat?.secondName,
-            status: "O",
-            amount: 1000,
-            balance: 1500,
-            user: "admin",
-        });
         setOpenConferm(true);
     };
-
     const handleCloseConferm = () => {
         setOpenConferm(false);
     };
@@ -151,136 +192,146 @@ const NewBillActivity: FunctionComponent<TProps> = ({
     }
 
     //  //  //  //  //
-
-    //  CREATE BILL //
-
+    //  SAVE BILL   //
     //  //  //  //  //
-
-    const [fullBill, setFullBill] = React.useState<FullBillDTO>();
-
+    const [messagge_success, setMessage] = useState(true);
     const saveBill = () => {
-
-        setFullBill({
-            bill: createBill,
-            billItems: items,
-            billPayments: [{
-                id: 0,
-                billId: 0,
-                date: "2020-03-19T14:58:00.000Z",
-                amount: 0,
-                user: "admin"
-            }]
-        });
-
-        fetch('https://www.open-hospital.org/oh11-api/bills', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'Authorization': 'Bearer '+token_auth,
-            },
-            body: JSON.stringify(fullBill),
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log("SUCCESS");
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+        if (fullBill !== undefined && items.length !== 0)
+            setBillComplete(true);
     }
 
-    return (
-        <div className="new_Bill">
-            <AppHeader
-                userCredentials={userCredentials}
-                breadcrumbMap={breadcrumbMap}
-            />
-            <div className="newBill__background">
-                <div className="newBill__content">
-                    <div className="newBill__title">{t("nav.newbill")}</div>
-                    <div className="newBill__panel">
-                        <div className="billPanel">
-                            <form>
-                                <div className="newBill_Head">
-                                    <div className="newBill_Date_Pat">
-                                        <TextField
-                                            className='bill_Date'
-                                            id="date"
-                                            label="SELECT DATE"
-                                            type="date"
-                                            defaultValue=""
-                                            InputLabelProps={{
-                                                shrink: true,
-                                            }}
-                                            onChange={e => get_date(e)}
-                                        />
-                                        <Button type="submit" className='bill_SelectPat' onClick={e => getPat(e)} variant="outlined">find Patient</Button>
-                                    </div>
-                                    <div className="newBill_InputPat">
-                                        <label>Patient</label><span></span><input className="patient_input" value={patient_data} disabled ></input>
-                                        <Button className="buttonBillSubmit" onClick={handleClickOpenConferm}>SAVE</Button>
-                                    </div>
+    useEffect(() => {
+        if (billComplete === true && fullBill !== undefined)
+            newBill(fullBill)
+    }, [billComplete, fullBill])
 
-                                </div>
-                                <div className="newBill_Rows">
-                                    <TableContainer className="tableDrawer" component={Paper}>
-                                        <Table size="small" aria-label="a dense table">
-                                            <TableHead>
-                                                <TableRow>
-                                                    <TableCell>Description</TableCell>
-                                                    <TableCell>Amount</TableCell>
-                                                    <TableCell>Qty</TableCell>
-                                                    <TableCell>Delete</TableCell>
-                                                </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-                                                {items?.map((x, y) => {
-                                                    return (
+    //display alert
+    const displayAlert = () => {
+        if (messagge_success === true) {
+            return (
+                <Alert onClose={() => { }}>Bill created successfuly </Alert>
+            )
+        }
+    }
+
+
+    switch (activityTransitionState) {
+        case "TO_DASHBOARD":
+            return <Redirect to={dashboardRoute} />;
+            case "TO_BILL_HOME":
+            return <Redirect to="/billing" />;
+        default:
+            return (
+                <div className="new_Bill">
+                    <AppHeader
+                        userCredentials={userCredentials}
+                        breadcrumbMap={breadcrumbMap}
+                    />
+                    <div className="newBill__background">
+                        <div className="newBill__content">
+                            <div className="newBill__title">{t("nav.newbill")}</div>
+                            <div className="newBill__panel">
+                                <div className="billPanel">
+
+                                    <form>
+                                        <div className="newBill_Head">
+                                            <div className="newBill_Date_Pat">
+                                                <TextField
+                                                    className='bill_Date'
+                                                    id="date"
+                                                    label="SELECT DATE"
+                                                    type="date"
+                                                    defaultValue=""
+                                                    InputLabelProps={{
+                                                        shrink: true,
+                                                    }}
+                                                    onChange={e => get_date(e)}
+                                                />
+                                                <Button type="submit" className='bill_SelectPat' onClick={e => getPat(e)} variant="outlined">find Patient</Button>
+                                            </div>
+                                            <div className="newBill_InputPat">
+                                                <label>Patient</label><span></span><input className="patient_input" value={patient_data} disabled ></input>
+                                                <Button className="buttonBillSubmit" onClick={handleClickOpenConferm}>SAVE</Button>
+                                            </div>
+
+                                        </div>
+                                        <div className="newBill_Rows">
+                                            <TableContainer className="tableDrawer" component={Paper}>
+                                                <Table size="small" aria-label="a dense table">
+                                                    <TableHead>
                                                         <TableRow>
-                                                            <TableCell>{x.hashCode}</TableCell>
-                                                            <TableCell>{x.itemAmount}</TableCell>
-                                                            <TableCell>{x.itemQuantity}</TableCell>
-                                                            <TableCell><Button onClick={() => delete_item(x)}><HighlightOffIcon></HighlightOffIcon></Button></TableCell>
+                                                            <TableCell>Description</TableCell>
+                                                            <TableCell>Amount</TableCell>
+                                                            <TableCell>Qty</TableCell>
+                                                            <TableCell>Delete</TableCell>
                                                         </TableRow>
-                                                    )
-                                                }
-                                                )}
-                                            </TableBody>
-                                        </Table>
-                                    </TableContainer>
+                                                    </TableHead>
+                                                    <TableBody>
+                                                        {items?.map((x, y) => {
+                                                            return (
+                                                                <TableRow>
+                                                                    <TableCell>{x.hashCode}</TableCell>
+                                                                    <TableCell>{x.itemAmount}</TableCell>
+                                                                    <TableCell>{x.itemQuantity}</TableCell>
+                                                                    <TableCell><Button onClick={() => delete_item(x)}><HighlightOffIcon></HighlightOffIcon></Button></TableCell>
+                                                                </TableRow>
+                                                            )
+                                                        }
+                                                        )}
+                                                    </TableBody>
+                                                </Table>
+                                            </TableContainer>
+                                        </div>
+                                    </form>
                                 </div>
-                            </form>
-                        </div>
-                        <div className="bill_Drawer">
-                            <DrawerActivity prices={prices} items={items} setItems={setItems} />
-                            <Dialog open={openConferm} onClose={handleCloseConferm} aria-labelledby="form-dialog-title">
-                                <DialogTitle id="form-dialog-title">Confirm Message</DialogTitle>
-                                <Button color="primary" size="large" onClick={saveBill} >Confirm</Button>
-                                <Button color="secondary" size="large" onClick={handleCloseConferm} >Cancel</Button>
-                                <DialogContent>
-                                    <div style={{ height: 30, width: 250 }}>
-                                    </div>
-                                </DialogContent>
-                            </Dialog>
+                                <div className="bill_Drawer">
+                                    <DrawerActivity prices={prices} items={items} setItems={setItems} />
+                                    <Dialog open={openConferm} onClose={handleCloseConferm} aria-labelledby="form-dialog-title">
+                                        <DialogTitle id="form-dialog-title">Confirm Message</DialogTitle>
+                                        <Button color="primary" size="large" onClick={saveBill} >Confirm</Button>
+                                        <Button color="secondary" size="large" onClick={handleCloseConferm} >Cancel</Button>
+                                        <DialogContent>
+                                            <div style={{ height: 30, width: 250 }}>
+                                            </div>
+                                        </DialogContent>
+                                    </Dialog>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    <ConfirmationDialog
+                        isOpen={hasSucceeded}
+                        title="Bill Created"
+                        icon={checkIcon}
+                        info={'The bill registration was successful'}
+                        primaryButtonLabel={t("common.dashboard")}
+                        secondaryButtonLabel={'Bill Dashboard'}
+                        handlePrimaryButtonClick={() =>
+                            setActivityTransitionState("TO_DASHBOARD")
+                        }
+                        handleSecondaryButtonClick={() =>
+                            setActivityTransitionState("TO_BILL_HOME")
+                        }
+                    />
+                    <Footer />
                 </div>
-            </div>
-            <Footer />
-        </div>
-    );
-}
-
+            );
+    }
+};
 
 const mapStateToProps = (state: IState): IStateProps => ({
     userCredentials: state.main.authentication.data,
     prices: state.prices.getPrices.data,
+    isLoading: state.bills.newBill.status === "LOADING",
+    hasSucceeded: state.bills.newBill.status === "SUCCESS",
+    hasFailed: state.bills.newBill.status === "FAIL",
 });
 
 
 const mapDispatchToProps: IDispatchProps = {
     getPrices,
+    newBill,
+    newBillReset,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(NewBillActivity);

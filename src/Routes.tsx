@@ -26,7 +26,7 @@ const Routes: FunctionComponent = () => {
           <BillingActivity />
         </PrivateRoute>
         <PrivateRoute path="/bills">
-          <NewBillActivity billHomeRoute="/billing"/>
+          <NewBillActivity billHomeRoute="/billing" dashboardRoute="/"/>
         </PrivateRoute>
         <PrivateRoute exact path="/">
           <DashboardActivity

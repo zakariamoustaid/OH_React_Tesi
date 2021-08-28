@@ -94,7 +94,7 @@ const DrawerActivity: FunctionComponent<PricesState> = ({
     //create rows for MED
     let rows_med: Row = [{ id: 0, group: '', description: '' }];
 
-    prices?.forEach(function (m, i) {
+    prices?.map((m, i) => {
         if (m.group === "MED")
             rows_med.push({ id: m.id, group: m.group, description: m.list?.description })
     })
@@ -155,6 +155,10 @@ const DrawerActivity: FunctionComponent<PricesState> = ({
                     }])
             }
         })
+        setOpen_med(false);
+        setOpen_ope(false);
+        setOpen_oth(false);
+        setOpen_exa(false);
     }
 
     //
@@ -192,8 +196,11 @@ const DrawerActivity: FunctionComponent<PricesState> = ({
                     "itemId": "1",
 
                 }])
+        else {
             setItemQ_cust(0);
             setDescription_cust('');
+        }
+        setOpen_cust(false);
     }
 
 

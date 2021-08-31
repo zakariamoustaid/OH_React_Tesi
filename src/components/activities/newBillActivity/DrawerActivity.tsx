@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
-import { DataGrid, GridSelectionModel, GridColDef, GridRowId, GridRowData } from '@material-ui/data-grid';
+import { DataGrid, GridRowId } from '@material-ui/data-grid';
 import Button from "@material-ui/core/Button";
 import Dialog from '@material-ui/core/Dialog';
 import ListItem from '@material-ui/core/ListItem';
@@ -9,9 +9,9 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import AddIcon from '@material-ui/icons/Add';
 import FormControl from '@material-ui/core/FormControl';
 import TextField from '@material-ui/core/TextField';
-import { PricesState, Item } from "./types";
+import { PricesState } from "./types";
 import "./styles.scss";
-
+import { SignalCellularNoSimOutlined } from "@material-ui/icons";
 
 const DrawerActivity: FunctionComponent<PricesState> = ({
     prices,
@@ -126,7 +126,7 @@ const DrawerActivity: FunctionComponent<PricesState> = ({
             rows_oth.push({ id: m.id, group: m.group, description: m.list?.description })
     })
     rows_oth?.shift(); //delete the first row used for definition
-
+    
 
     //fill the array of Items to send to father who will display them
     const take_items = () => {
@@ -134,8 +134,10 @@ const DrawerActivity: FunctionComponent<PricesState> = ({
             //if-else case to check if item is already in the bill
             if ((items?.some(it => it.hashCode === i)) === true) {
                 items.forEach(function (x) {
-                    //x.itemQuantity++;
-                    console.log("How to solve the typescript messagge: Object is possibly 'undefined'?")
+                    if(x.itemQuantity !== undefined && x.hashCode === i)
+                    {
+                        ++x.itemQuantity;
+                    }
                 })
             }
             else {
@@ -146,9 +148,9 @@ const DrawerActivity: FunctionComponent<PricesState> = ({
                         "id": 1,
                         "price": true,
                         "billId": 1,
-                        "priceId": "test",
+                        "priceId": String(prices?.find(p => p.id == i)?.id),
                         "itemDescription": prices?.find(p => p.id == i)?.list?.description,
-                        "itemAmount": 1,
+                        "itemAmount": prices?.find(p => p.id == i)?.price,
                         "itemQuantity": 1,
                         "itemDisplayCode": "test",
                         "itemId": "1",
@@ -188,7 +190,7 @@ const DrawerActivity: FunctionComponent<PricesState> = ({
                     "id": 1,
                     "price": true,
                     "billId": 1,
-                    "priceId": "test",
+                    "priceId": description_cust,
                     "itemDescription": description_cust,
                     "itemAmount": 1,
                     "itemQuantity": itemQ_cust,
@@ -272,7 +274,7 @@ const DrawerActivity: FunctionComponent<PricesState> = ({
             </Dialog>
             <ListItem button key="Custom" onClick={handleClickOpen_cust}><AddIcon></AddIcon>Custom</ListItem>
             <Dialog open={open_cust} onClose={handleClose_cust} aria-labelledby="form-dialog-title">
-                <DialogTitle id="form-dialog-title">Select Other</DialogTitle>
+                <DialogTitle id="form-dialog-title">Insert Custom</DialogTitle>
                 <Button onClick={confirm_cust}>Confirm</Button>
                 <DialogContent>
                     <div style={{ height: 200, width: 450 }}>

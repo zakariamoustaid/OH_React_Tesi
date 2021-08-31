@@ -18,7 +18,8 @@ import { IState } from "../../../types";
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
-import Alert from '@material-ui/lab/Alert';
+import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
 import "./styles.scss";
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import {
@@ -38,6 +39,22 @@ import DrawerActivity from "./DrawerActivity";
 import { BillDTO, BillItemsDTO, FullBillDTO, PatientDTO } from "../../../generated";
 import TextField from "@material-ui/core/TextField";
 import ConfirmationDialog from "../../accessories/confirmationDialog/ConfirmationDialog";
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
+import { makeStyles, Theme } from '@material-ui/core/styles';
+
+function Alert(props: AlertProps) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
+const useStyles = makeStyles((theme: Theme) => ({
+    root: {
+        width: '100%',
+        '& > * + *': {
+            marginTop: theme.spacing(2),
+        },
+    },
+}));
 
 const NewBillActivity: FunctionComponent<TProps> = ({
     userCredentials,
@@ -73,12 +90,12 @@ const NewBillActivity: FunctionComponent<TProps> = ({
 
     useEffect(() => {
         if (
-          activityTransitionState === "TO_BILL_HOME" ||
-          activityTransitionState === "TO_DASHBOARD"
+            activityTransitionState === "TO_BILL_HOME" ||
+            activityTransitionState === "TO_DASHBOARD"
         ) {
             newBillReset();
         }
-      }, [activityTransitionState]);
+    }, [activityTransitionState]);
 
     //  //  //  //  //
     //  GET TOKEN   //
@@ -122,6 +139,7 @@ const NewBillActivity: FunctionComponent<TProps> = ({
             }
         };
         fetchData();
+
     };
 
     const patient_data = pat?.firstName + " " + pat?.secondName;
@@ -194,7 +212,6 @@ const NewBillActivity: FunctionComponent<TProps> = ({
     //  //  //  //  //
     //  SAVE BILL   //
     //  //  //  //  //
-    const [messagge_success, setMessage] = useState(true);
     const saveBill = () => {
         if (fullBill !== undefined && items.length !== 0)
             setBillComplete(true);
@@ -205,20 +222,67 @@ const NewBillActivity: FunctionComponent<TProps> = ({
             newBill(fullBill)
     }, [billComplete, fullBill])
 
-    //display alert
-    const displayAlert = () => {
-        if (messagge_success === true) {
-            return (
-                <Alert onClose={() => { }}>Bill created successfuly </Alert>
-            )
+    //Increase Items
+    const [confirmInc, setConfirmInc] = useState(false);
+    const [confirmDec, setDecIt] = useState(false);
+
+
+    useEffect(() => {
+        if (items !== undefined) { }
+    }, [items])
+
+    const incrementItem = (e: BillItemsDTO) => {
+        if (e.itemQuantity !== undefined) {
+            ++e.itemQuantity
+            setConfirmInc(true)
         }
     }
+
+    const decrementItem = (e: BillItemsDTO) => {
+        if (e.itemQuantity !== undefined) {
+            --e.itemQuantity
+        }
+    }
+
+    //  //  //  //  //  //  // 
+    // Success inc/dec item //
+    // //  //  //  //  //  //
+    const classes = useStyles();
+    const [openMessage, setOpenMessage] = React.useState(false);
+
+    const handleClickChangePlus = (e: BillItemsDTO) => {
+        setOpenMessage(false);
+        if (e.itemQuantity !== undefined)
+            ++e.itemQuantity
+        setOpenMessage(true);
+    };
+
+    const handleClickChangeMinus = (e: BillItemsDTO) => {
+        setOpenMessage(false);
+        if (e.itemQuantity !== undefined) {
+            if (e.itemQuantity > 1)
+                --e.itemQuantity
+            else {
+                delete_item(e);
+            }
+        }
+        setOpenMessage(true);
+    };
+
+    const handleCloseChange = (event?: React.SyntheticEvent, reason?: string) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenMessage(false);
+    };
+
+
 
 
     switch (activityTransitionState) {
         case "TO_DASHBOARD":
             return <Redirect to={dashboardRoute} />;
-            case "TO_BILL_HOME":
+        case "TO_BILL_HOME":
             return <Redirect to="/billing" />;
         default:
             return (
@@ -261,6 +325,7 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                                                     <TableHead>
                                                         <TableRow>
                                                             <TableCell>Description</TableCell>
+                                                            <TableCell>Id</TableCell>
                                                             <TableCell>Amount</TableCell>
                                                             <TableCell>Qty</TableCell>
                                                             <TableCell>Delete</TableCell>
@@ -270,9 +335,10 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                                                         {items?.map((x, y) => {
                                                             return (
                                                                 <TableRow>
+                                                                    <TableCell>{x.itemDescription}</TableCell>
                                                                     <TableCell>{x.hashCode}</TableCell>
                                                                     <TableCell>{x.itemAmount}</TableCell>
-                                                                    <TableCell>{x.itemQuantity}</TableCell>
+                                                                    <TableCell>{x.itemQuantity}<Button onClick={() => handleClickChangePlus(x)}><AddIcon></AddIcon></Button><Button onClick={() => handleClickChangeMinus(x)}><RemoveIcon></RemoveIcon></Button></TableCell>
                                                                     <TableCell><Button onClick={() => delete_item(x)}><HighlightOffIcon></HighlightOffIcon></Button></TableCell>
                                                                 </TableRow>
                                                             )
@@ -313,6 +379,11 @@ const NewBillActivity: FunctionComponent<TProps> = ({
                             setActivityTransitionState("TO_BILL_HOME")
                         }
                     />
+                    <Snackbar open={openMessage} autoHideDuration={2000} onClose={handleCloseChange}>
+                        <Alert onClose={handleCloseChange} severity="success">
+                            Action Confirmed
+                        </Alert>
+                    </Snackbar>
                     <Footer />
                 </div>
             );

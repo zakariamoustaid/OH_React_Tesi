@@ -1,10 +1,6 @@
 import { Dispatch, SetStateAction } from "react";
 import { BillItemsDTO, FullBillDTO } from "../../../generated";
 import { PriceDTO } from "../../../generated";
-import {
-  PatientDTOFatherEnum, PatientDTOHasInsuranceEnum,
-  PatientDTOMotherEnum, PatientDTOParentTogetherEnum,
-  PatientDTOSexEnum} from "../../../generated";
 import { TUserCredentials } from "../../../state/main/types";
 
 
@@ -45,7 +41,7 @@ export interface IDispatchProps {
 export type TProps = IOwnProps & IStateProps & IDispatchProps;
 
 export type Item = {
-  "hashCode": number | undefined,
+  "hashCode": number | undefined, //not
   "id": number | undefined,
   "price": boolean | undefined,
   "billId": number | undefined,
@@ -53,8 +49,8 @@ export type Item = {
   "itemDescription": string | undefined,
   "itemAmount": number | undefined,
   "itemQuantity": number | undefined,
-  "itemDisplayCode": string | undefined,
-  "itemId": number | undefined,
+  "itemDisplayCode": string | undefined, //not
+  "itemId": number | undefined, //not 
 }
 
 export type TActivityTransitionState = "IDLE" | "TO_BILL_HOME" | "TO_DASHBOARD";

@@ -1,5 +1,5 @@
 # Sviluppo parte Billing OH_UI
-Il progetto di Tesi riguarda lo sviluppo e l'implementazione di una soluzione di inserimento delle fatture (relativa alla parte di Billing).\
+Il progetto di Tesi riguarda lo sviluppo e l'implementazione di una soluzione di inserimento delle fatture (parte Billing).\
 La repository contiene una web user interface relativo al progetto Open Hospital (SPA REACT).\
 Lo sviluppo del form di inserimento è sintetizzato nei seguenti step:\
 1.Analisi delle APIs presenti su OpenApi\

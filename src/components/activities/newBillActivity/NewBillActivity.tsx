@@ -1,10 +1,9 @@
-import React, { ChangeEvent, Children, FunctionComponent, useEffect, useRef, useState } from "react";
+import React, { FunctionComponent, useEffect, useState } from "react";
 import { Redirect } from "react-router";
 import AppHeader from "../../accessories/appHeader/AppHeader";
 import Footer from "../../accessories/footer/Footer";
 import Button from "@material-ui/core/Button";
 import Table from '@material-ui/core/Table';
-import TextData from '@material-ui/core/TextField'
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
@@ -43,10 +42,10 @@ import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert, { AlertProps } from '@material-ui/lab/Alert';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 
+//management message increase/decrease items in the bill
 function Alert(props: AlertProps) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
-
 const useStyles = makeStyles((theme: Theme) => ({
     root: {
         width: '100%',
@@ -55,6 +54,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         },
     },
 }));
+//end management 
 
 const NewBillActivity: FunctionComponent<TProps> = ({
     userCredentials,

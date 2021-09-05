@@ -1,10 +1,9 @@
-import React, { FunctionComponent, useEffect, useRef } from "react";
+import React, { FunctionComponent } from "react";
 import AppHeader from "../../accessories/appHeader/AppHeader";
 import Footer from "../../accessories/footer/Footer";
 import Button from "@material-ui/core/Button";
-import { IState } from "../../../types";
-import { Link, useHistory } from "react-router-dom";
-import { IStateProps, TProps } from "./types";
+import { useHistory } from "react-router-dom";
+import { TProps } from "./types";
 import { useTranslation } from "react-i18next";
 import "./styles.scss";
 
@@ -19,8 +18,6 @@ const BillingActivity: FunctionComponent<TProps> = ({
         [t("nav.dashboard")]: "/",
         [t("nav.billing")]: "/bill",
     };
-
-    
 
     return (
         <div className="billing">

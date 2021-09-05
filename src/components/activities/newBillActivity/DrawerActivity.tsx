@@ -11,7 +11,6 @@ import FormControl from '@material-ui/core/FormControl';
 import TextField from '@material-ui/core/TextField';
 import { PricesState } from "./types";
 import "./styles.scss";
-import { SignalCellularNoSimOutlined } from "@material-ui/icons";
 
 const DrawerActivity: FunctionComponent<PricesState> = ({
     prices,

@@ -41,7 +41,7 @@ export interface IDispatchProps {
 export type TProps = IOwnProps & IStateProps & IDispatchProps;
 
 export type Item = {
-  "hashCode": number | undefined, //not
+  "hashCode": number | undefined, //doesn't match with directus
   "id": number | undefined,
   "price": boolean | undefined,
   "billId": number | undefined,
@@ -49,8 +49,8 @@ export type Item = {
   "itemDescription": string | undefined,
   "itemAmount": number | undefined,
   "itemQuantity": number | undefined,
-  "itemDisplayCode": string | undefined, //not
-  "itemId": number | undefined, //not 
+  "itemDisplayCode": string | undefined, //doesn't match with directus
+  "itemId": number | undefined, //doesn't match with directus
 }
 
 export type TActivityTransitionState = "IDLE" | "TO_BILL_HOME" | "TO_DASHBOARD";
